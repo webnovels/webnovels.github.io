@@ -1,0 +1,56 @@
+---
+layout: default
+---
+
+<div class="novel-index">
+  <header>
+    <h1>{{ page.title }}</h1>
+    {% if page.genre %}<nav class="breadcrumbs">
+      <a href="{{ '/' | relative_url }}">Home</a> &gt;
+      Genres &gt;
+      <a href="{{ '/genre/' | append:(page.genre|downcase) |append:'/' }}">{{page.genre}}</a>
+    </nav>
+    {% endif %}
+  </header>
+
+  <div class="novel-description">
+    {{ content }}
+  </div>
+
+  <h2>Table of Contents</h2>
+  <ul class="chapter-list">
+    {% assign chapters = site.novels | where: "novel_id", page.novel_id | where_exp: "item", "item.chapter_number" | sort: "chapter_number" %}
+    {% for chapter in chapters %}
+      <li>
+        <a href="{{ chapter.url | relative_url }}">
+          {% if chapter.chapter_number %}Chapter {{ chapter.chapter_number }}{% endif %}
+          {% if chapter.title %}：{{ chapter.title }}{% endif %}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<style>
+  .novel-index {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .novel-description {
+    margin: 20px 0;
+    line-height: 1.6;
+  }
+  
+  .chapter-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .chapter-list li {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+</style>

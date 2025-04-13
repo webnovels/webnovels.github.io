@@ -1,0 +1,55 @@
+---
+layout: default
+---
+
+<article class="novel-chapter">
+  <header>
+    <h1>{{ page.title }}</h1>
+    {% if page.subtitle %}<h3>{{ page.subtitle }}</h3>{% endif %}
+  </header>
+
+  <div class="chapter-content">
+    {{ content }}
+  </div>
+
+  <div class="chapter-navigation">
+    {% if page.previous_chapter %}
+      <a href="{{ page.previous_chapter | relative_url }}" class="prev-link">&laquo; 上一章</a>
+    {% endif %}
+    
+    <a href="{{ page.novel_index | relative_url }}" class="index-link">目录</a>
+    
+    {% if page.next_chapter %}
+      <a href="{{ page.next_chapter | relative_url }}" class="next-link">下一章 &raquo;</a>
+    {% endif %}
+  </div>
+</article>
+
+<style>
+  .novel-chapter {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    line-height: 1.8;
+  }
+  
+  .chapter-content {
+    margin: 30px 0;
+    font-size: 1.1em;
+  }
+  
+  .chapter-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+  }
+  
+  .chapter-navigation a {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-decoration: none;
+  }
+</style>
