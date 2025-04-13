@@ -67,3 +67,7 @@ defaults:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+google:
+  tag_manager:
+    container_id: GTM-WTZ99H2B
