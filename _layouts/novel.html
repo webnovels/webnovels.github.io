@@ -19,7 +19,8 @@ layout: default
 
   <h2>Table of Contents</h2>
   <ul class="chapter-list">
-    {% assign chapters = site.novels | where: "novel_id", page.novel_id | where_exp: "item", "item.chapter_number" | sort: "chapter_number" %}
+    {% assign chapters = site.novels | where_exp: "item", "item.url contains page.url" | where_exp: "item", "item.chapter_number" | sort: "chapter_number" %}
+    
     {% for chapter in chapters %}
       <li>
         <a href="{{ chapter.url | relative_url }}">
