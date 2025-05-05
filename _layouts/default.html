@@ -17,5 +17,36 @@
     {%- include footer.html -%}
     {%- include body_end.html -%}
   </body>
-
+<style>
+  /* Base Styles */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  :root {
+    --primary-color: #3498db;
+    --primary-dark: #2980b9;
+    --secondary-color: #8e44ad;
+    --text-color: #333;
+    --text-light: #7f8c8d;
+    --bg-color: #f9f9f9;
+    --card-bg: #ffffff;
+    --border-radius: 8px;
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+  }
+  
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
+</style>
 </html>
