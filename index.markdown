@@ -100,7 +100,7 @@ description: Discover captivating original novels, web serials, and fiction stor
               <h3><a href="{{ novel.url | relative_url }}">{{ novel.title }}</a></h3>
               <div class="novel-meta">
                 <span class="author"><i class="fa fa-user"></i> {{ novel.author }}</span>
-                <span class="chapters"><i class="fa fa-book"></i> {{ novel.chapter_count | default: '10' }}</span>
+                <!-- <span class="chapters"><i class="fa fa-book"></i> {{ novel.chapter_count | default: '10' }}</span> -->
               </div>
               <div class="tags">
                 {% for genre in novel.genres limit: 2 %}
