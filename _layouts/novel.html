@@ -8,7 +8,7 @@ layout: default
     {% if page.genre %}<nav class="breadcrumbs">
       <a href="{{ '/' | relative_url }}">Home</a> &gt;
       Genres &gt;
-      <a href="{{ '/genre/' | append:(page.genre|downcase) |append:'/' }}">{{page.genre}}</a>
+      <a href="{{ '/genre/' | append: page.genre | downcase | append: '/' | relative_url }}">{{page.genre}}</a>
     </nav>
     {% endif %}
   </header>
@@ -16,7 +16,7 @@ layout: default
   <div class="novel-description">
     {{ content }}
   </div>
-
+  
   <h2>Table of Contents</h2>
   <ul class="chapter-list">
     {% assign chapters = site.novels | where_exp: "item", "item.url contains page.url" | where_exp: "item", "item.chapter_number" | sort: "chapter_number" %}
