@@ -31,6 +31,7 @@ github_username:
 theme: minima
 plugins:
   - jekyll-feed
+  - jekyll-redirect-from
 
 # 添加小说集合
 collections:
