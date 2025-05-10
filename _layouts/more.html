@@ -39,7 +39,7 @@ layout: default
         <p>Copy your exclusive token and search it in the App for more chapters</p>
         <div class="token-container">
           <input type="text" readonly id="novelToken" value="{{ page.token  }}">
-          <button onclick="copyToken()" class="copy-btn">Copy Token</button>
+          <button onclick="copyToken(); gtmTrackDownload('TOKEN');" class="copy-btn">Copy Token</button>
         </div>
         <span id="copyMessage" class="copy-message">Token copied!</span>
       </div>
@@ -240,7 +240,7 @@ layout: default
     window.dataLayer.push({
       'event': 'purchase',
       'app_platform': platform,
-      'app_store': platform === 'Android' ? 'Google Play' : 'App Store',
+      'app_store': platform === 'Android' ? 'Google Play' : (platform === 'TOKEN'?'TOKEN':'App Store'),
       'novel_name': novelName,
       'novel_subtitle': novelSubtitle,
       'novel_token': token,
