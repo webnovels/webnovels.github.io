@@ -234,11 +234,20 @@ layout: default
     var token = document.getElementById('novelToken').value || '';
     var pageUrl = window.location.href;
     var pageTitle = document.title;
+    var transactionId = 'app_' + platform.toLowerCase() + '_' + token + '_' + Date.now();
+
+    var itemData = {
+      item_id: pageUrl,
+      item_name: novelName,
+      item_variant: platform,
+      price: 1,
+      quantity: 1
+    };
     
     
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
-      'event': 'purchase',
+      'event': 'app_download',
       'app_platform': platform,
       'app_store': platform === 'Android' ? 'Google Play' : (platform === 'TOKEN'?'TOKEN':'App Store'),
       'novel_name': novelName,
@@ -246,8 +255,10 @@ layout: default
       'novel_token': token,
       'page_url': pageUrl,
       'page_title': pageTitle,
-      'download_value': 1,
-      'currency': 'CNY'
+      'value': 1,
+      'currency': 'CNY',
+      'transaction_id': transactionId,
+      'items': [itemData]
     });
     
     console.log('App download tracked:', platform, novelName);
