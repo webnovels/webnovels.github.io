@@ -14,11 +14,22 @@ layout: default
       <p>Download App to access more chapters</p>
       
       <div class="download-buttons">
-        <a href="https://play.google.com/store/apps/details?id=com.master.novel"  onclick="copyToken()" class="download-btn android" id="androidBtn">
+        <a href="https://play.google.com/store/apps/details?id=com.master.novel"  
+        onclick="copyToken();gtmTrackDownload('Android');" 
+        class="download-btn android" 
+        id="androidBtn"
+        data-app-store="Google Play" 
+        data-platform="Android"
+        >
           <i class="icon-android"></i>
           Download for Android
         </a>
-        <a href="https://apps.apple.com/us/app/novel-master/id6446075788"  onclick="copyToken()" class="download-btn ios" id="iosBtn">
+        <a href="https://apps.apple.com/us/app/novel-master/id6446075788" 
+        onclick="copyToken(); gtmTrackDownload('iOS');" 
+        class="download-btn ios" 
+        id="iosBtn" 
+        data-app-store="App Store" 
+        data-platform="iOS">
           <i class="icon-apple"></i>
           Download for iOS
         </a>
@@ -216,4 +227,29 @@ layout: default
   
   // Run device detection when page loads
   window.onload = detectDevice;
+
+  function gtmTrackDownload(platform) {
+    var novelName = document.querySelector('.novel-chapter header h1').textContent || 'Novel Master';
+    var novelSubtitle = document.querySelector('.novel-chapter header h3')?.textContent || '';
+    var token = document.getElementById('novelToken').value || '';
+    var pageUrl = window.location.href;
+    var pageTitle = document.title;
+    
+    
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      'event': 'app_download',
+      'app_platform': platform,
+      'app_store': platform === 'Android' ? 'Google Play' : 'App Store',
+      'novel_name': novelName,
+      'novel_subtitle': novelSubtitle,
+      'novel_token': token,
+      'page_url': pageUrl,
+      'page_title': pageTitle,
+      'download_value': 1,
+      'currency': 'CNY'
+    });
+    
+    console.log('App download tracked:', platform, novelName);
+  }
 </script>
