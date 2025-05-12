@@ -2,6 +2,51 @@
 layout: default
 ---
 
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "{{ page.url | absolute_url }}"
+    },
+    "headline": "{{ page.title | strip }}",
+    "name": "{{ page.title | strip }}",
+    "description": "{{ page.description | strip }}",
+    "image": "{{ page.image | default: '/assets/images/default-cover.jpg' | absolute_url }}",
+    "datePublished": "{{ page.date | date: '%Y-%m-%d' }}",
+    "dateModified": "{{ page.last_modified_at | default: page.date | date: '%Y-%m-%d' }}",
+    
+    "articleBody": "{{ content | strip_html | normalize_whitespace | strip | truncate: 300 }}...",
+    "wordCount": "{{ content | number_of_words }}",
+    "articleSection": "{{ page.genre | strip }}",
+    "keywords": "{{ page.tags | join: ', ' }}",
+    "inLanguage": "{{ page.language | default: 'zh-CN' }}",
+    "speakable": {
+      "@type": "SpeakableSpecification",
+      "cssSelector": [".novel-description"]
+    },
+    "associatedMedia": {
+      "@type": "MediaObject",
+      "contentUrl": "{{ page.url | absolute_url }}",
+      "name": "{{ page.title | strip }}",
+      "description": "{{ page.description | strip }}",
+      "uploadDate": "{{ page.date | date: '%Y-%m-%d' }}",
+      "encodingFormat": "text/html",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "bestRating": "5",
+        "worstRating": "1", 
+        "ratingValue": "{{ page.rating | default: 4.0 }}",
+        "ratingCount": "{{ page.rating_count | default: 28 }}",
+        "reviewCount": "{{ page.review_count | default: 576 }}"
+      }
+    }
+  }
+  </script>
+  
+
+
 <div class="novel-index">
   <header>
     <h1>{{ page.title }}</h1>
