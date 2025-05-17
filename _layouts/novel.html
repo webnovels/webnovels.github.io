@@ -47,7 +47,7 @@ layout: default
   
 
 
-<div class="novel-index">
+<div class="novel-index" id="capture-area">
   <header>
     <h1>{{ page.title }}</h1>
     {% if page.genre %}<nav class="breadcrumbs">
@@ -61,7 +61,34 @@ layout: default
   <div class="novel-description">
     {{ content }}
   </div>
+</div>
+<div class="novel-index">
+
+  <button class="share-btn pulse" id="shareButton">
+    <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+        <polyline points="16 6 12 2 8 6"></polyline>
+        <line x1="12" y1="2" x2="12" y2="15"></line>
+    </svg>
+  </button>
+
   
+  <div class="loading" id="loadingIndicator">
+        <div class="loading-spinner"></div>
+        <p>Loading for Spinner...</p>
+    </div>
+    
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModal">&times;</span>
+            <h2>Share</h2>
+            <img id="screenshotResult" class="screenshot-image" alt="screenshot">
+            <div class="share-container">
+                <button class="download-btn" id="downloadBtn">Download</button>
+                <div class="sharethis-inline-share-buttons" id="shareButtons"></div>
+            </div>
+        </div>
+    </div>
   <h2>Table of Contents</h2>
   <ul class="chapter-list">
     {% assign chapters = site.novels | where_exp: "item", "item.url contains page.url" | where_exp: "item", "item.chapter_number" | sort: "chapter_number" %}
@@ -76,7 +103,7 @@ layout: default
     {% endfor %}
   </ul>
   {%- include alsolike.html -%}
-  <div class="sharethis-inline-share-buttons"></div>
+  <!-- <div class="sharethis-inline-share-buttons"></div> -->
 </div>
 
 <style>
@@ -101,4 +128,285 @@ layout: default
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
   }
+
+
+  .share-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: #1a73e8;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            border: none;
+            cursor: pointer;
+            z-index: 99;
+            transition: all 0.3s ease;
+        }
+        .share-btn:hover {
+            background-color: #0d62c7;
+            transform: scale(1.05);
+        }
+        .share-icon {
+            width: 24px;
+            height: 24px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .modal-content {
+            position: relative;
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            text-align: center;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        .screenshot-image {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .share-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 15px;
+        }
+        .download-btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            background-color: #1a73e8;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            display: inline-block;
+            margin: 10px 0 15px;
+            border: none;
+        }
+        .download-btn:hover {
+            background-color: #0d62c7;
+        }
+        .sharethis-container {
+            margin-top: 5px;
+            width: 100%;
+        }
+
+        /* Updated loading indicator styles */
+        .loading {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.7);
+          z-index: 1010;
+          
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+        }
+        
+        .loading-spinner {
+          border: 5px solid #f3f3f3;
+          border-top: 5px solid #3498db;
+          border-radius: 50%;
+          width: 50px;
+          height: 50px;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 15px;
+        }
+        
+        .loading p {
+          color: white;
+          font-size: 16px;
+          margin: 0;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(26, 115, 232, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(26, 115, 232, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(26, 115, 232, 0); }
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+            const shareButton = document.getElementById('shareButton');
+            const modal = document.getElementById('shareModal');
+            const closeModal = document.getElementById('closeModal');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const downloadBtn = document.getElementById('downloadBtn');
+            let screenshotDataUrl = '';
+            
+            shareButton.addEventListener('click', function() {
+                loadingIndicator.style.display = 'flex';
+                
+                const captureArea = document.getElementById('capture-area');
+                
+                const tempContainer = document.createElement('div');
+                tempContainer.style.padding = '10px';
+                tempContainer.style.backgroundColor = '#ffffff';
+                tempContainer.style.display = 'inline-block';
+                tempContainer.style.maxWidth = '390px';
+                tempContainer.style.borderRadius = '8px';
+                tempContainer.style.overflow = 'hidden'; // Ensure clean edges
+
+                const clonedElement = captureArea.cloneNode(true);
+
+                const urlBar = document.createElement('div');
+                urlBar.style.backgroundColor = '#f1f3f4';
+                urlBar.style.padding = '8px 12px';
+                urlBar.style.borderTop = '1px solid #ddd';
+                urlBar.style.display = 'flex';
+                urlBar.style.alignItems = 'center';
+                urlBar.style.marginTop = '10px';
+
+                // Add lock icon
+                const lockIcon = document.createElement('span');
+                lockIcon.innerHTML = '🔒';
+                lockIcon.style.marginRight = '6px';
+                lockIcon.style.fontSize = '12px';
+
+                // Add URL text
+                const urlText = document.createElement('span');
+                urlText.textContent = 'webnovel.github.io';
+                urlText.style.fontSize = '13px';
+                urlText.style.color = '#333';
+                urlText.style.fontFamily = 'Arial, sans-serif';
+                urlText.style.whiteSpace = 'nowrap';
+                urlText.style.overflow = 'hidden';
+                urlText.style.textOverflow = 'ellipsis';
+
+                // Assemble URL bar
+                urlBar.appendChild(lockIcon);
+                urlBar.appendChild(urlText);
+
+                const h1Elements = clonedElement.querySelectorAll('h1');
+                h1Elements.forEach(h1 => {
+                    // h1.style.wordSpacing = '0.25em';
+                    h1.style.letterSpacing = '0.5px';
+                    h1.style.whiteSpace = 'normal';
+                    h1.style.textRendering = 'optimizeLegibility';
+                });
+                
+                
+                tempContainer.appendChild(clonedElement);
+                tempContainer.appendChild(urlBar);
+                
+                tempContainer.style.position = 'absolute';
+                tempContainer.style.left = '-9999px';
+                document.body.appendChild(tempContainer);
+                
+                html2canvas(tempContainer, {
+                    scale: 2,
+                    logging: false,
+                    useCORS: true,
+                    backgroundColor: '#ffffff'
+                }).then(function(canvas) {
+                    document.body.removeChild(tempContainer);
+                    loadingIndicator.style.display = 'none';
+                    
+                    screenshotDataUrl = canvas.toDataURL('image/png');
+                    document.getElementById('screenshotResult').src = screenshotDataUrl;
+                    
+                    modal.style.display = 'block';
+                    
+                    // initializeShareButtons();
+                }).catch(function(error) {
+                    loadingIndicator.style.display = 'none';
+                    alert('share fail.');
+                    console.error('Screenshot error:', error);
+                });
+
+                window.dataLayer = window.dataLayer || [];
+                window.dataLayer.push({
+                  'event': 'share',
+                  'method': 'create',
+                  'content_type': 'Pic',
+                  'item_id': window.location.href
+                });
+                
+                console.log('Share:');
+            });
+            
+            closeModal.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+            
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            downloadBtn.addEventListener('click', function() {
+                if (screenshotDataUrl) {
+                    const a = document.createElement('a');
+                    a.href = screenshotDataUrl;
+                    a.download = 'screenshot.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+
+                    window.dataLayer = window.dataLayer || [];
+                    window.dataLayer.push({
+                      'event': 'share',
+                      'method': 'download',
+                      'content_type': 'Pic',
+                      'item_id': window.location.href
+                    });
+                    
+                    console.log('Share:');
+                }
+            });
+            
+            // function initializeShareButtons() {
+            //     if (window.ShareThis) {
+            //         document.getElementById('shareButtons').innerHTML = '';
+                    
+            //         const shareThisButtons = document.createElement('div');
+            //         shareThisButtons.className = 'sharethis-inline-share-buttons';
+            //         shareThisButtons.setAttribute('data-url', window.location.href);
+            //         shareThisButtons.setAttribute('data-title', '小说网站目录');
+            //         shareThisButtons.setAttribute('data-image', screenshotDataUrl);
+            //         shareThisButtons.setAttribute('data-description', '小说网站目录页面截图分享');
+                    
+            //         document.getElementById('shareButtons').appendChild(shareThisButtons);
+                    
+            //         if (typeof window.__sharethis__ !== 'undefined') {
+            //             window.__sharethis__.initialize();
+            //         }
+            //     }
+            // }
+        });
+</script>
