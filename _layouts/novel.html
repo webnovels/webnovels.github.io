@@ -13,7 +13,7 @@ layout: default
     "headline": "{{ page.title | strip }}",
     "name": "{{ page.title | strip }}",
     "description": "{{ page.description | strip }}",
-    "image": "{{ page.image | default: '/assets/images/default-cover.jpg' | absolute_url }}",
+    "image": "{{ page.cover_image | default: '/assets/images/default-cover.jpg' | absolute_url }}",
     "datePublished": "{{ page.date | date: '%Y-%m-%d' }}",
     "dateModified": "{{ page.last_modified_at | default: page.date | date: '%Y-%m-%d' }}",
     
@@ -39,7 +39,7 @@ layout: default
         "worstRating": "1", 
         "ratingValue": "{{ page.rating | default: 4.0 }}",
         "ratingCount": "{{ page.rating_count | default: 28 }}",
-        "reviewCount": "{{ page.review_count | default: 576 }}"
+        "reviewCount": "{{ page.views | default: 576 }}"
       }
     }
   }
