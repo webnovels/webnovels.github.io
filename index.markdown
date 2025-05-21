@@ -414,21 +414,6 @@ description: Discover captivating original novels, web serials, and fiction stor
     margin-bottom: 10px;
   }
   
-  .novel-carousel {
-    display: flex;
-    overflow-x: auto;
-    gap: 15px;
-    padding: 10px 0;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-  }
-  
-  .novel-carousel::-webkit-scrollbar {
-    display: none;
-  }
-  
   .novel-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -465,7 +450,7 @@ description: Discover captivating original novels, web serials, and fiction stor
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+    /* transition: transform 0.5s ease; */
   }
   
   .novel-card:hover .novel-cover img {
@@ -940,10 +925,7 @@ description: Discover captivating original novels, web serials, and fiction stor
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     }
     
-    .novel-carousel {
-      padding-bottom: 10px;
-      scroll-padding: 15px;
-    }
+ 
     
     .novel-card {
       flex: 0 0 85%;
@@ -1239,49 +1221,6 @@ description: Discover captivating original novels, web serials, and fiction stor
       });
     });
     
-    // Improve carousel swiping experience on mobile
-    const carousels = document.querySelectorAll('.novel-carousel');
     
-    carousels.forEach(carousel => {
-      let isDown = false;
-      let startX;
-      let scrollLeft;
-      
-      carousel.addEventListener('mousedown', (e) => {
-        isDown = true;
-        carousel.style.cursor = 'grabbing';
-        startX = e.pageX - carousel.offsetLeft;
-        scrollLeft = carousel.scrollLeft;
-      });
-      
-      carousel.addEventListener('mouseleave', () => {
-        isDown = false;
-        carousel.style.cursor = 'grab';
-      });
-      
-      carousel.addEventListener('mouseup', () => {
-        isDown = false;
-        carousel.style.cursor = 'grab';
-      });
-      
-      carousel.addEventListener('mousemove', (e) => {
-        if(!isDown) return;
-        e.preventDefault();
-        const x = e.pageX - carousel.offsetLeft;
-        const walk = (x - startX) * 2;
-        carousel.scrollLeft = scrollLeft - walk;
-      });
-      
-      // Hide swipe indicator after first interaction
-      carousel.addEventListener('scroll', function() {
-        const indicator = this.parentElement.querySelector('.swipe-indicator');
-        if (indicator) {
-          indicator.style.opacity = '0';
-          setTimeout(() => {
-            indicator.style.display = 'none';
-          }, 300);
-        }
-      }, { once: true });
-    });
   });
 </script>
