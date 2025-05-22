@@ -283,6 +283,9 @@ layout: default
 
                 const clonedElement = captureArea.cloneNode(true);
 
+                clonedElement.style.maxHeight = '600px';
+                clonedElement.style.overflow = 'hidden';
+
                 const urlBar = document.createElement('div');
                 urlBar.style.backgroundColor = '#f1f3f4';
                 urlBar.style.padding = '8px 12px';
@@ -331,7 +334,8 @@ layout: default
                     scale: 2,
                     logging: false,
                     useCORS: true,
-                    backgroundColor: '#ffffff'
+                    backgroundColor: '#ffffff',
+                    height: Math.min(tempContainer.scrollHeight, 700)
                 }).then(function(canvas) {
                     document.body.removeChild(tempContainer);
                     loadingIndicator.style.display = 'none';

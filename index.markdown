@@ -34,7 +34,7 @@ description: Discover captivating original novels, web serials, and fiction stor
   <div class="container">
     <h2>Featured Webnovels</h2>
     <div class="featured-stack">
-      {% assign featured_novels = site.novels | where: "featured", true | limit: 5 %}
+      {% assign featured_novels = site.novels | where: "featured", true | sort: 'last_updated' | reverse | slice: 0, 20  %}
       {% for novel in featured_novels %}
         <div class="featured-stack-item">
           <div class="stack-cover">
@@ -83,7 +83,7 @@ description: Discover captivating original novels, web serials, and fiction stor
           {% endif %}
         {% endfor %}
         
-        {% assign sorted_novels = novel_indexes | sort: 'last_updated' | reverse | limit: 4 %}
+        {% assign sorted_novels = novel_indexes | sort: 'last_updated' | reverse | slice: 0, 20 %}
         {% for novel in sorted_novels %}
           <div class="novel-card">
             <div class="novel-cover">
@@ -121,7 +121,7 @@ description: Discover captivating original novels, web serials, and fiction stor
     <div class="container">
       <h2>Trending This Week</h2>
       <div class="trending-list">
-        {% assign trending_novels = novel_indexes | sort: 'views' | reverse | limit: 5 %}
+        {% assign trending_novels = novel_indexes | sort: 'views' | reverse | slice: 0, 50 %}
         {% for novel in trending_novels %}
           <div class="trending-item">
             <div class="trending-rank">{{ forloop.index }}</div>
