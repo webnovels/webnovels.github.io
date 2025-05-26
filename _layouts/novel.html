@@ -95,7 +95,7 @@ layout: default
     
     {% for chapter in chapters %}
       <li>
-        <a href="{{ chapter.url | relative_url }}">
+        <a href="{{ chapter.url | relative_url }}" rel="nofollow">
           {% if chapter.chapter_number %}Chapter {{ chapter.chapter_number }}{% endif %}
           {% if chapter.title %}：{{ chapter.title }}{% endif %}
         </a>
