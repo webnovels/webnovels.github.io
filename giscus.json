@@ -1,0 +1,7 @@
+{
+  "origins": [
+    "https://webnovels.github.io",
+    "http://localhost:4000"
+  ],
+  "defaultCommentOrder": "newest"
+}
