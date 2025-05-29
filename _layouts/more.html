@@ -11,7 +11,7 @@ layout: default
   <div class="chapter-content">
     <div class="app-download-section">
       <h3>Continue Reading Full Content</h3>
-      <p>Download App to access more chapters</p>
+      <p>Download App:NovelMaster to access more chapters</p>
       
       <div class="download-buttons">
         <a href="https://play.google.com/store/apps/details?id=com.master.novel"  
@@ -36,7 +36,7 @@ layout: default
       </div>
       
       <div class="token-section">
-        <p>Copy your exclusive token and search it in the App for more chapters</p>
+        <p>Copy your exclusive token and search it in the App:NovelMaster for more chapters</p>
         <div class="token-container">
           <input type="text" readonly id="novelToken" value="{{ page.token  }}">
           <button onclick="copyToken(); gtmTrackDownload('TOKEN');" class="copy-btn">Copy Token</button>
@@ -191,8 +191,7 @@ layout: default
 <!-- JavaScript for enhanced mobile experience -->
 <script>
   // Function to detect device type
-  function detectDevice() {
-    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  var userAgent = navigator.userAgent || navigator.vendor || window.opera;
     
     // Check if mobile device
     var isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
@@ -202,6 +201,9 @@ layout: default
     
     // Check if Android
     var isAndroid = /android/i.test(userAgent.toLowerCase());
+
+  function detectDevice() {
+    
     
     // Get button elements
     var androidBtn = document.getElementById("androidBtn");
@@ -277,6 +279,18 @@ layout: default
     
     console.log('App download tracked:', platform, novelName);
   }
+
+  const downloadLinks = {
+    IOS: {
+      US: 'https://apps.apple.com/us/app/novel-master/id6446075788',
+      PH: 'https://apps.apple.com/ph/app/novel-master/id6446075788',
+      NG: 'https://apps.apple.com/ng/app/novel-master/id6446075788',
+      MY: 'https://apps.apple.com/my/app/novel-master/id6446075788',
+      CA: 'https://apps.apple.com/ca/app/novel-master/id6446075788',
+      default: 'https://apps.apple.com/us/app/novel-master/id6446075788',
+    }
+  };
+  var country = 'US';
   
   // Add lazy loading for the related novels' images
   document.addEventListener('DOMContentLoaded', function() {
@@ -320,5 +334,18 @@ layout: default
         }, 200);
       }, {passive: true});
     });
+
+
+    //change downloadlink
+    fetch('https://ipapi.co/json/')
+    .then(res => res.json())
+    .then(data => {
+      country = data.country_code; // 比如 'US', 'CN', 'IN' 等
+      let link = downloadLinks['IOS']?.[country] || downloadLinks['IOS']?.default;
+      document.getElementById("iosBtn").href = link;
+    });
+
+      
+
   });
 </script>
