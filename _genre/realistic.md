@@ -38,7 +38,7 @@ permalink: /genre/realistic/
           <div class="novel-card">
             <div class="novel-cover">
               {% if novel.cover_image %}
-                <img src="{{ novel.cover_image | relative_url }}" alt="{{ novel.title }} - Realistic Fiction Novel Cover">
+                {% include picture.html img=novel.cover_image alt= novel.title  %}
               {% else %}
                 <div class="cover-placeholder">{{ novel.title | slice: 0, 1 }}</div>
               {% endif %}
@@ -127,7 +127,7 @@ permalink: /genre/realistic/
           <div class="novel-card">
             <div class="novel-cover">
               {% if novel.cover_image %}
-                <img src="{{ novel.cover_image | relative_url }}" alt="{{ novel.title }} - Realistic Fiction Novel Cover">
+                {% include picture.html img=novel.cover_image alt= novel.title  %}
               {% else %}
                 <div class="cover-placeholder">{{ novel.title | slice: 0, 1 }}</div>
               {% endif %}

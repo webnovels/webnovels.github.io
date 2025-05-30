@@ -1,0 +1,7 @@
+{% assign img = include.img | relative_url  %}
+{% assign img_ext = img | split: '.' | last %}
+{% assign img_name = img | remove: img_ext | remove: '.' %}
+<picture>
+    <source type="image/webp" srcset="{{ img_name }}.webp" >
+    <img src="{{ img_name }}.{{ img_ext }}" alt="{{ include.alt }}" loading="lazy" />
+</picture>

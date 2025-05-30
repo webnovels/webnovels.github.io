@@ -39,7 +39,7 @@ description: Discover captivating original novels, web serials, and fiction stor
         <div class="featured-stack-item">
           <div class="stack-cover">
             {% if novel.cover_image %}
-              <img src="{{ novel.cover_image | relative_url }}" alt="{{ novel.title }}" loading="lazy">
+              {% include picture.html img=novel.cover_image alt= novel.title  %}
             {% else %}
               <div class="cover-placeholder">{{ novel.title | slice: 0, 1 }}</div>
             {% endif %}
@@ -88,7 +88,7 @@ description: Discover captivating original novels, web serials, and fiction stor
           <div class="novel-card">
             <div class="novel-cover">
               {% if novel.cover_image %}
-                <img src="{{ novel.cover_image | relative_url }}" alt="{{ novel.title }}" loading="lazy">
+                {% include picture.html img=novel.cover_image alt= novel.title  %}
               {% else %}
                 <div class="cover-placeholder">{{ novel.title | slice: 0, 1 }}</div>
               {% endif %}
@@ -127,7 +127,7 @@ description: Discover captivating original novels, web serials, and fiction stor
             <div class="trending-rank">{{ forloop.index }}</div>
             <div class="trending-cover">
               {% if novel.cover_image %}
-                <img src="{{ novel.cover_image | relative_url }}" alt="{{ novel.title }}" loading="lazy">
+                {% include picture.html img=novel.cover_image alt= novel.title  %}
               {% else %}
                 <div class="cover-placeholder small">{{ novel.title | slice: 0, 1 }}</div>
               {% endif %}

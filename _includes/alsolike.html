@@ -15,7 +15,9 @@
         <div class="related-novel-card">
           <div class="related-novel-cover">
             {% if novel.cover_image %}
-            <a href="{{ novel.url | relative_url }}"><img src="{{ novel.cover_image | relative_url }}" alt="{{ novel.title }}" loading="lazy"></a>
+            <a href="{{ novel.url | relative_url }}">
+              {% include picture.html img=novel.cover_image alt= novel.title  %}
+            </a>
             {% else %}
               <div class="cover-placeholder small">{{ novel.title | slice: 0, 1 }}</div>
             {% endif %}

@@ -70,5 +70,7 @@ defaults:
 #   - vendor/gems/
 #   - vendor/ruby/
 webp:
+  enabled: true
   quality: 80       # 质量 (0-100)
   extensions: [".jpg", ".jpeg", ".png"]
+  img_dir: ["/images"]
