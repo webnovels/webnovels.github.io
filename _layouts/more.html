@@ -11,7 +11,7 @@ layout: default
   <div class="chapter-content">
     <div class="app-download-section">
       <h3>Continue Reading Full Content</h3>
-      <p>Download App:NovelMaster to access more chapters</p>
+      <p>Download App:{% if page.appname %}{{page.appname}}{% else %}NovelMaster{% endif %} to access more chapters</p>
       
       <div class="download-buttons">
         <a href="https://play.google.com/store/apps/details?id=com.master.novel"  
@@ -297,14 +297,28 @@ layout: default
   }
 
   const downloadLinks = {
-    IOS: {
-      US: 'https://apps.apple.com/us/app/novel-master/id6446075788',
-      PH: 'https://apps.apple.com/ph/app/novel-master/id6446075788',
-      NG: 'https://apps.apple.com/ng/app/novel-master/id6446075788',
-      MY: 'https://apps.apple.com/my/app/novel-master/id6446075788',
-      CA: 'https://apps.apple.com/ca/app/novel-master/id6446075788',
-      default: 'https://apps.apple.com/us/app/novel-master/id6446075788',
+    RealNovel:{
+      IOS: {
+        default: 'https://apps.apple.com/us/app/realnovel/id6683304338',
+      },
+      Android:{
+        default: 'https://play.google.com/store/apps/details?id=com.sereal.ministory',
+      }
+    },
+    NovelMaster:{
+      IOS: {
+        US: 'https://apps.apple.com/us/app/novel-master/id6446075788',
+        PH: 'https://apps.apple.com/ph/app/novel-master/id6446075788',
+        NG: 'https://apps.apple.com/ng/app/novel-master/id6446075788',
+        MY: 'https://apps.apple.com/my/app/novel-master/id6446075788',
+        CA: 'https://apps.apple.com/ca/app/novel-master/id6446075788',
+        default: 'https://apps.apple.com/us/app/novel-master/id6446075788',
+      },
+      Android:{
+        default: 'https://play.google.com/store/apps/details?id=com.master.novel',
+      }
     }
+    
   };
   var country = 'US';
   
@@ -351,14 +365,18 @@ layout: default
       }, {passive: true});
     });
 
+  const appname = {% if page.appname %}{{ page.appname | jsonify }}{% else %}"NovelMaster"{% endif %};
 
+    
     //change downloadlink
     fetch('https://ipapi.co/json/')
     .then(res => res.json())
     .then(data => {
       country = data.country_code; // 比如 'US', 'CN', 'IN' 等
-      let link = downloadLinks['IOS']?.[country] || downloadLinks['IOS']?.default;
-      document.getElementById("iosBtn").href = link;
+      let ioslink = downloadLinks[appname]['IOS']?.[country] || downloadLinks[appname]['IOS']?.default;
+      document.getElementById("iosBtn").href = ioslink;
+      let androidlink = downloadLinks[appname]['Android']?.[country] || downloadLinks[appname]['Android']?.default;
+      document.getElementById("androidBtn").href = androidlink;
     });
 
       
