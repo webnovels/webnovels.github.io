@@ -36,7 +36,7 @@ layout: default
       </div>
       
       <div class="token-section">
-        <p>Copy your exclusive token and search it in the App:NovelMaster for more chapters</p>
+        <p>Copy your exclusive token and search it in the App:{% if page.appname %}{{page.appname}}{% else %}NovelMaster{% endif %} for more chapters</p>
         <div class="token-container">
           <input type="text" readonly id="novelToken" value="{{ page.token  }}">
           <button onclick="copyToken(); gtmTrackDownload('TOKEN');" class="copy-btn">Copy Token</button>
