@@ -8,19 +8,19 @@ layout: default
     "@type": "BlogPosting",
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": "{{ page.url | absolute_url }}"
+      "@id": {{ page.url | absolute_url | jsonify }}
     },
-    "headline": "{{ page.title | strip }}",
-    "name": "{{ page.title | strip }}",
-    "description": "{{ page.description | strip }}",
-    "image": "{{ page.cover_image | default: '/assets/images/default-cover.jpg' | absolute_url }}",
+    "headline": {{ page.title | strip | jsonify }},
+    "name": {{ page.title | strip | jsonify }},
+    "description": {{ page.description | strip | jsonify }},
+    "image": {{ page.cover_image | default: '/assets/images/default-cover.jpg' | absolute_url | jsonify }},
     "datePublished": "{{ page.date | date: '%Y-%m-%d' }}",
     "dateModified": "{{ page.last_modified_at | default: page.date | date: '%Y-%m-%d' }}",
     
-    "articleBody": "{{ content | strip_html | normalize_whitespace | strip | truncate: 300 }}...",
+    "articleBody": {{ content | strip_html | normalize_whitespace | strip | truncate: 300 | jsonify }},
     "wordCount": "{{ content | number_of_words }}",
-    "articleSection": "{{ page.genre | strip }}",
-    "keywords": "{{ page.tags | join: ', ' }}",
+    "articleSection": {{ page.genre | strip | jsonify }},
+    "keywords": {{ page.tags | join: ', ' | jsonify }},
     "inLanguage": "{{ page.language | default: 'zh-CN' }}",
     "speakable": {
       "@type": "SpeakableSpecification",
@@ -28,9 +28,9 @@ layout: default
     },
     "associatedMedia": {
       "@type": "MediaObject",
-      "contentUrl": "{{ page.url | absolute_url }}",
-      "name": "{{ page.title | strip }}",
-      "description": "{{ page.description | strip }}",
+      "contentUrl": {{ page.url | absolute_url | jsonify }},
+      "name": {{ page.title | strip | jsonify }},
+      "description": {{ page.description | strip | jsonify }},
       "uploadDate": "{{ page.date | date: '%Y-%m-%d' }}",
       "encodingFormat": "text/html",
       "aggregateRating": {
