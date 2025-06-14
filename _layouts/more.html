@@ -39,7 +39,7 @@ layout: default
         <p>Copy your exclusive token and search it in the App:{% if page.appname %}{{page.appname}}{% else %}NovelMaster{% endif %} for more chapters</p>
         <div class="token-container">
           <input type="text" readonly id="novelToken" value="{{ page.token  }}">
-          <button onclick="copyToken(); gtmTrackDownload('TOKEN');" class="copy-btn">Copy Token</button>
+          <button onclick="copyToken(); gtmTrackDownload('TOKEN');" class="copy-btn">Copy And Open</button>
         </div>
         <span id="copyMessage" class="copy-message">Token copied!</span>
       </div>
@@ -244,13 +244,28 @@ layout: default
   }
   
   // Function to copy token
-  function copyToken() {
+  function copyToken(event) {
     var tokenInput = document.getElementById("novelToken");
     tokenInput.select();
     document.execCommand("copy");
     
     var copyMessage = document.getElementById("copyMessage");
     copyMessage.style.display = "inline-block";
+
+    // Get button elements
+    var androidBtn = document.getElementById("androidBtn");
+    var iosBtn = document.getElementById("iosBtn");
+    
+    // Show appropriate buttons
+    if (isMobile) {
+      if (isIOS) {
+        window.location.href=iosBtn.href;
+      } else if (isAndroid) {
+        window.location.href=androidBtn.href;
+      }
+    } 
+
+
     
     setTimeout(function() {
       copyMessage.style.display = "none";
