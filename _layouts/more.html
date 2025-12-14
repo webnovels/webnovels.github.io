@@ -313,7 +313,7 @@ layout: default
   }
 
   const downloadLinks = {
-    RealNovel:{
+    realnovel:{
       IOS: {
         default: 'https://apps.apple.com/us/app/realnovel/id6683304338',
       },
@@ -321,7 +321,15 @@ layout: default
         default: 'https://play.google.com/store/apps/details?id=com.sereal.ministory',
       }
     },
-    NovelMaster:{
+    webfic:{
+      IOS: {
+        default: 'https://apps.apple.com/us/app/webfic-make-reading-fantastic/id1517946671',
+      },
+      Android:{
+        default: 'https://play.google.com/store/apps/details?id=com.webfic.novel',
+      }
+    },
+    novelmaster:{
       IOS: {
         US: 'https://apps.apple.com/us/app/novel-master/id6446075788',
         PH: 'https://apps.apple.com/ph/app/novel-master/id6446075788',
@@ -381,7 +389,7 @@ layout: default
       }, {passive: true});
     });
 
-  const appname = {% if page.appname %}{{ page.appname | jsonify }}{% else %}"NovelMaster"{% endif %};
+  const appname = {% if page.appname %}{{ page.appname | jsonify }}{% else %}"NovelMaster"{% endif %}.toLowerCase();
 
     
     //change downloadlink

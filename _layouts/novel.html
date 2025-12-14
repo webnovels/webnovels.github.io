@@ -91,6 +91,11 @@ layout: default
     </div>
   <h2>Table of Contents</h2>
   <ul class="chapter-list">
+    <li>
+        <a href="./more/" rel="nofollow">
+          More
+        </a>
+      </li>
     {% assign chapters = site.novels | where_exp: "item", "item.url contains page.url" | where_exp: "item", "item.chapter_number" | sort: "chapter_number" %}
     
     {% for chapter in chapters %}
