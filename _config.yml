@@ -74,3 +74,6 @@ webp:
   quality: 80       # 质量 (0-100)
   extensions: [".jpg", ".jpeg", ".png"]
   img_dir: ["/images"]
+  cache: true  # 启用缓存
+  cachedir: ".jekyll-webp-cache"  # 缓存目录
+  regenerate: false  # 设为 false 以跳过已处理的图片
