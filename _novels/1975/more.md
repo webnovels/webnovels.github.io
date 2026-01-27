@@ -1,0 +1,10 @@
+---
+layout: more
+titleO: "The Forgotten Vows"
+title: "The Forgotten Vows"
+novel_index: "/novels/1975/"
+previous_chapter: "/novels/1975/"
+token: "345728"
+appname: "motonovel"
+---
+
