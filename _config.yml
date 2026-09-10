@@ -34,6 +34,10 @@ plugins:
   - jekyll-redirect-from
   - jekyll-webp
 
+# Include IndexNow key file (static .txt in root)
+include:
+  - 04d1d1f4e58d098cbe167fb54cd70d8e.txt
+
 # 添加小说集合
 collections:
   novels:
