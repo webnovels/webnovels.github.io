@@ -1,0 +1,335 @@
+---
+layout: default
+title: "My Bookshelf - Saved Novels | WebNovels"
+description: "View your saved and bookmarked novels. Continue reading where you left off on WebNovels."
+permalink: /bookshelf/
+redirect_from:
+  - /bookshelf
+---
+
+<header class="bookshelf-header">
+  <div class="container">
+    <nav class="breadcrumbs">
+      <a href="{{ '/' | relative_url }}">Home</a> &gt;
+      <span>Bookshelf</span>
+    </nav>
+    <h1><i class="fa fa-bookmark"></i> My Bookshelf</h1>
+    <p>Your saved novels, ready to continue reading.</p>
+  </div>
+</header>
+
+<main class="bookshelf-wrapper">
+  <div class="container">
+    <div id="bookshelf-stats" class="bookshelf-stats" style="display:none;">
+      <span class="stat-item"><i class="fa fa-book"></i> <span id="stat-count">0</span> Novels</span>
+      <a href="{{ '/' | relative_url }}" class="browse-more"><i class="fa fa-plus"></i> Browse more novels</a>
+    </div>
+
+    <div id="bookshelf-list" class="novel-grid">
+      <div class="empty-state">
+        <i class="fa fa-bookmark-o"></i>
+        <h2>Your bookshelf is empty</h2>
+        <p>Start adding novels while reading! Click the "Add to Bookshelf" button on any novel or chapter page.</p>
+        <a href="{{ '/' | relative_url }}" class="browse-btn">Browse Novels</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<style>
+  .bookshelf-header {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    padding: 40px 0 30px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .bookshelf-header .breadcrumbs {
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+  }
+  .bookshelf-header .breadcrumbs a {
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .bookshelf-header .breadcrumbs a:hover {
+    color: white;
+  }
+  .bookshelf-header h1 {
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+  }
+  .bookshelf-header p {
+    font-size: 1.05rem;
+    opacity: 0.9;
+  }
+  .bookshelf-wrapper {
+    min-height: 500px;
+    padding: 20px 0;
+  }
+  .bookshelf-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+  }
+  .stat-item {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #2c3e50;
+  }
+  .browse-more {
+    color: #3498db;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  .browse-more:hover {
+    text-decoration: underline;
+  }
+  .novel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .novel-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+  }
+  .novel-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  }
+  .novel-card .cover-placeholder {
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #3498db;
+    color: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+  }
+  .novel-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+  }
+  .novel-card .novel-info {
+    padding: 15px;
+  }
+  .novel-card h3 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+  .novel-card h3 a {
+    color: #2c3e50;
+  }
+  .novel-card .novel-desc {
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .novel-card .novel-meta {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .novel-card .remove-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    transition: background 0.3s;
+  }
+  .remove-btn:hover {
+    background: #c81818;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #7f8c8d;
+    grid-column: 1 / -1;
+  }
+  .empty-state i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #bdc3c7;
+  }
+  .empty-state h2 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    color: #2c3e50;
+  }
+  .empty-state p {
+    font-size: 0.95rem;
+    margin-bottom: 25px;
+  }
+  .browse-btn {
+    display: inline-block;
+    padding: 10px 25px;
+    background: #3498db;
+    color: white;
+    border-radius: 25px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: background 0.3s;
+  }
+  .browse-btn:hover {
+    background: #2980b9;
+  }
+  @media (max-width: 768px) {
+    .novel-grid {
+      grid-template-columns: 1fr;
+    }
+    .bookshelf-stats {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var bookshelfKey = 'webnovels_bookshelf';
+  var listDiv = document.getElementById('bookshelf-list');
+  var statsDiv = document.getElementById('bookshelf-stats');
+  var statCount = document.getElementById('stat-count');
+
+  var bookshelf = JSON.parse(localStorage.getItem(bookshelfKey) || '[]');
+
+  if (bookshelf.length === 0) {
+    // 显示空状态
+    listDiv.innerHTML = '<div class="empty-state">' +
+      '<i class="fa fa-bookmark-o"></i>' +
+      '<h2>Your bookshelf is empty</h2>' +
+      '<p>Start adding novels while reading! Click the "Add to Bookshelf" button on any novel or chapter page.</p>' +
+      '<a href="{{ "/" | relative_url }}" class="browse-btn">Browse Novels</a>' +
+      '</div>';
+    return;
+  }
+
+  // 显示统计信息
+  statsDiv.style.display = 'flex';
+  statCount.textContent = bookshelf.length;
+
+  // 加载小说索引
+  fetch('{{ "/search.json" | relative_url }}')
+    .then(function(r) { return r.json(); })
+    .then(function(novels) {
+      // 构建 URL -> novel 的映射
+      var novelMap = {};
+      novels.forEach(function(n) {
+        novelMap[n.url] = n;
+      });
+
+      var html = '';
+      var foundCount = 0;
+
+      bookshelf.forEach(function(novelUrl) {
+        // 尝试精确匹配和带域名匹配
+        var novel = novelMap[novelUrl] || novelMap[novelUrl.replace(/^https?:\/\/[^/]+/, '')];
+
+        if (novel) {
+          foundCount++;
+          var cover = novel.cover_image
+            ? '<img src="' + novel.cover_image + '" alt="' + escapeHtml(novel.title) + '" loading="lazy">'
+            : '<div class="cover-placeholder">' + escapeHtml(novel.title.charAt(0)) + '</div>';
+          var desc = novel.description ? escapeHtml(novel.description.substring(0, 120)) : '';
+
+          html += '<div class="novel-card" data-novel-url="' + escapeHtml(novelUrl) + '">' +
+            '<button class="remove-btn" title="Remove from bookshelf"><i class="fa fa-times"></i></button>' +
+            '<div class="novel-cover">' + cover + '</div>' +
+            '<div class="novel-info">' +
+              '<h3><a href="' + novel.url + '">' + escapeHtml(novel.title) + '</a></h3>' +
+              '<p class="novel-desc">' + desc + '</p>' +
+              '<div class="novel-meta">' +
+                '<span><i class="fa fa-tag"></i> ' + escapeHtml(novel.genre || 'Fiction') + '</span>' +
+                '<span><i class="fa fa-star"></i> ' + (novel.rating || 4.0) + '</span>' +
+              '</div>' +
+              '<a href="' + novel.url + '" class="read-btn" style="display:inline-block;background:#3498db;color:white;padding:8px 15px;border-radius:4px;font-size:0.85rem;">Continue Reading</a>' +
+            '</div>' +
+          '</div>';
+        } else {
+          // 小说未在索引中找到，显示 URL 链接
+          html += '<div class="novel-card" data-novel-url="' + escapeHtml(novelUrl) + '">' +
+            '<button class="remove-btn" title="Remove from bookshelf"><i class="fa fa-times"></i></button>' +
+            '<div class="cover-placeholder"><i class="fa fa-book"></i></div>' +
+            '<div class="novel-info">' +
+              '<h3><a href="' + novelUrl + '">View Novel</a></h3>' +
+              '<p class="novel-desc">Novel details not available.</p>' +
+              '<a href="' + novelUrl + '" style="color:#3498db;font-size:0.85rem;">Open page →</a>' +
+            '</div>' +
+          '</div>';
+        }
+      });
+
+      listDiv.innerHTML = html;
+
+      // 绑定删除按钮
+      document.querySelectorAll('.remove-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var card = this.closest('.novel-card');
+          var url = card.getAttribute('data-novel-url');
+          var shelf = JSON.parse(localStorage.getItem(bookshelfKey) || '[]');
+          shelf = shelf.filter(function(u) { return u !== url; });
+          localStorage.setItem(bookshelfKey, JSON.stringify(shelf));
+
+          // 动画移除
+          card.style.transition = 'opacity 0.3s, transform 0.3s';
+          card.style.opacity = '0';
+          card.style.transform = 'scale(0.8)';
+          setTimeout(function() {
+            card.remove();
+            // 更新计数
+            var newCount = JSON.parse(localStorage.getItem(bookshelfKey) || '[]').length;
+            statCount.textContent = newCount;
+            if (newCount === 0) {
+              statsDiv.style.display = 'none';
+              listDiv.innerHTML = '<div class="empty-state">' +
+                '<i class="fa fa-bookmark-o"></i>' +
+                '<h2>Your bookshelf is empty</h2>' +
+                '<p>Start adding novels while reading!</p>' +
+                '<a href="{{ "/" | relative_url }}" class="browse-btn">Browse Novels</a>' +
+                '</div>';
+            }
+          }, 300);
+        });
+      });
+    })
+    .catch(function(e) {
+      listDiv.innerHTML = '<div class="empty-state">' +
+        '<i class="fa fa-exclamation-triangle"></i>' +
+        '<h2>Error loading bookshelf</h2>' +
+        '<p>Please refresh the page or try again later.</p>' +
+        '</div>';
+    });
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+});
+</script>

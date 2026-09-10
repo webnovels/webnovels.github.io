@@ -10,7 +10,7 @@ description: Discover captivating original novels, web serials, and fiction stor
     <p class="tagline"><strong>2,000+ free novels</strong> updated daily. Betrayal, rebirth, romance & more.</p>
     <div class="search-box">
       <input type="text" id="novel-search" placeholder="Search novels by title or genre...">
-      <button type="button" aria-label="Search" onclick="document.getElementById('novel-search').focus()"><i class="fa fa-search"></i></button>
+      <button type="button" aria-label="Search" onclick="var q=document.getElementById('novel-search').value.trim(); if(q) window.location.href='/search/?q='+encodeURIComponent(q); else document.getElementById('novel-search').focus()"><i class="fa fa-search"></i></button>
     </div>
 
     <!-- 热门小说直接入口 - 第一屏即可点击 -->
@@ -1179,7 +1179,7 @@ description: Discover captivating original novels, web serials, and fiction stor
         if (e.key === 'Enter') {
           const query = this.value.trim();
           if (query) {
-            window.location.href = '{{ "/search" | relative_url }}?q=' + encodeURIComponent(query);
+            window.location.href = '{{ "/search/" | relative_url }}?q=' + encodeURIComponent(query);
           }
         }
       });
