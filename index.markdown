@@ -7,11 +7,20 @@ description: Discover captivating original novels, web serials, and fiction stor
 <header class="hero-section">
   <div class="container">
     <h1 class="main-title">WebNovels</h1>
-    <p class="tagline">Discover Your Next Reading Adventure</p>
-    <!-- <div class="search-box">
-      <input type="text" id="novel-search" placeholder="Search novels...">
-      <button type="button" aria-label="Search"><i class="fa fa-search"></i></button>
-    </div> -->
+    <p class="tagline"><strong>2,000+ free novels</strong> updated daily. Betrayal, rebirth, romance & more.</p>
+    <div class="search-box">
+      <input type="text" id="novel-search" placeholder="Search novels by title or genre...">
+      <button type="button" aria-label="Search" onclick="document.getElementById('novel-search').focus()"><i class="fa fa-search"></i></button>
+    </div>
+
+    <!-- 热门小说直接入口 - 第一屏即可点击 -->
+    <div class="hero-trending">
+      <span class="trending-label"><i class="fa fa-fire"></i> Trending Now:</span>
+      {% assign top_novels = site.novels | where: "featured", true | sort: 'views' | reverse | slice: 0, 5 %}
+      {% for novel in top_novels %}
+        <a href="{{ novel.url | relative_url }}" class="trending-link" title="{{ novel.title }}">{{ novel.title | truncate: 30 }}</a>{% unless forloop.last %}<span class="trending-sep">·</span>{% endunless %}
+      {% endfor %}
+    </div>
   </div>
 </header>
 
@@ -65,7 +74,10 @@ description: Discover captivating original novels, web serials, and fiction stor
       <h2>Popular Genres</h2>
       <div class="genre-list">
         <a href="{{ '/genre/realistic/' | relative_url }}" class="genre-tag">Realistic</a>
-        
+        <a href="{{ '/genre/romance/' | relative_url }}" class="genre-tag">Romance</a>
+        <a href="{{ '/genre/betrayal/' | relative_url }}" class="genre-tag">Betrayal</a>
+        <a href="{{ '/genre/rebirth/' | relative_url }}" class="genre-tag">Rebirth</a>
+        <a href="{{ '/genre/billionaire/' | relative_url }}" class="genre-tag">Billionaire</a>
       </div>
     </div>
   </section>
@@ -351,8 +363,40 @@ description: Discover captivating original novels, web serials, and fiction stor
   .search-box button:hover {
     background: var(--primary-dark);
   }
-  
-  /* Mobile Navigation */
+
+  /* Trending novels bar - hero section */
+  .hero-trending {
+    margin-top: 18px;
+    padding: 10px 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 0.88rem;
+    backdrop-filter: blur(4px);
+  }
+  .hero-trending .trending-label {
+    color: #ffd700;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .hero-trending .trending-link {
+    color: white;
+    text-decoration: none;
+    padding: 3px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  .hero-trending .trending-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    text-decoration: underline;
+  }
+  .hero-trending .trending-sep {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
   .mobile-nav {
     background: white;
     margin-bottom: 20px;

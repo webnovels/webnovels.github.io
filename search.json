@@ -1,0 +1,23 @@
+---
+layout: null
+---
+[
+{% assign novel_indexes = "" | split: ',' %}
+{% for item in site.novels %}
+  {% assign url_parts = item.url | split: '/' %}
+  {% if url_parts.size == 3 %}
+    {% assign novel_indexes = novel_indexes | push: item %}
+  {% endif %}
+{% endfor %}
+{% for novel in novel_indexes %}
+{
+  "title": {{ novel.title | jsonify }},
+  "url": {{ novel.url | absolute_url | jsonify }},
+  "genre": {{ novel.genre | default: "Fiction" | jsonify }},
+  "description": {{ novel.description | default: novel.excerpt | strip_html | truncate: 100 | jsonify }},
+  "views": {{ novel.views | default: 0 }},
+  "rating": {{ novel.rating | default: 4.0 }},
+  "cover_image": {{ novel.cover_image | default: "" | jsonify }}
+}{% unless forloop.last %},{% endunless %}
+{% endfor %}
+]

@@ -31,4 +31,13 @@ layout: null
     </url>
     {% endfor %}
 
+    {% for genre in site.genre %}
+    <url>
+      <loc>{{ site.url }}{{ genre.url }}</loc>
+      <lastmod>{{ site.time | date_to_xmlschema }}</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.8</priority>
+    </url>
+    {% endfor %}
+
 </urlset>

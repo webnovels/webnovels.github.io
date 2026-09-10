@@ -56,6 +56,39 @@ layout: default
       <a href="{{ '/genre/' | append: page.genre | downcase | append: '/' | relative_url }}">{{page.genre}}</a>
     </nav>
     {% endif %}
+
+    <!-- 加入书架按钮 -->
+    <div class="novel-bookmark-bar">
+      <button class="bookmark-btn" id="novelBookmarkBtn" data-novel-url="{{ page.url }}">
+        <i class="fa fa-bookmark"></i> <span class="bookmark-text">Add to Bookshelf</span>
+      </button>
+      <a href="{{ '/bookshelf/' | relative_url }}" class="view-bookshelf-link">
+        <i class="fa fa-list"></i> View Bookshelf
+      </a>
+    </div>
+
+    <!-- 小说信息钩子 - 首屏吸引力增强 -->
+    <div class="novel-hook">
+      <div class="hook-meta">
+        {% if page.genre %}
+        <span class="hook-badge genre-badge"><i class="fa fa-tag"></i> {{ page.genre }}</span>
+        {% endif %}
+        {% if page.views %}
+        <span class="hook-badge views-badge"><i class="fa fa-eye"></i> {{ page.views | plus: 0 }} reads</span>
+        {% endif %}
+        {% if page.rating %}
+        <span class="hook-badge rating-badge"><i class="fa fa-star"></i> {{ page.rating }}/5.0</span>
+        {% endif %}
+        {% if page.status %}
+        <span class="hook-badge status-badge {% if page.status == 'Completed' %}completed{% else %}ongoing{% endif %}">
+          <i class="fa fa-circle"></i> {{ page.status }}
+        </span>
+        {% endif %}
+      </div>
+      {% if page.description %}
+      <p class="hook-tagline">{{ page.description | truncate: 160 }}</p>
+      {% endif %}
+    </div>
   </header>
 
   <div class="novel-description">
@@ -279,7 +312,132 @@ layout: default
         .pulse {
             animation: pulse 2s infinite;
         }
+
+  /* 小说页书签栏样式 */
+  .novel-bookmark-bar {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 15px 0;
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+  }
+  .novel-bookmark-bar .bookmark-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background 0.3s, transform 0.2s;
+  }
+  .novel-bookmark-bar .bookmark-btn:hover { background: #2980b9; }
+  .novel-bookmark-bar .bookmark-btn:active { transform: scale(0.97); }
+  .novel-bookmark-bar .bookmark-btn.active { background: #27ae60; }
+  .novel-bookmark-bar .bookmark-btn.active .bookmark-text::before { content: "✓ "; }
+  .novel-bookmark-bar .view-bookshelf-link {
+    color: #7f8c8d;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.3s;
+  }
+  .novel-bookmark-bar .view-bookshelf-link:hover { color: #3498db; }
+
+  /* 小说信息钩子样式 */
+  .novel-hook {
+    margin: 15px 0 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+  }
+  .novel-hook .hook-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .novel-hook .hook-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 500;
+  }
+  .novel-hook .genre-badge {
+    background: #e3f2fd;
+    color: #1976d2;
+  }
+  .novel-hook .views-badge {
+    background: #fff3e0;
+    color: #e65100;
+  }
+  .novel-hook .rating-badge {
+    background: #fff8e1;
+    color: #f57f17;
+  }
+  .novel-hook .status-badge {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+  .novel-hook .status-badge.ongoing {
+    background: #fff3e0;
+    color: #e65100;
+  }
+  .novel-hook .status-badge .fa-circle {
+    font-size: 0.6em;
+  }
+  .novel-hook .hook-tagline {
+    margin: 0;
+    padding: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #444;
+    font-style: italic;
+  }
 </style>
+
+<script>
+// 小说页书架功能 - 基于 localStorage
+document.addEventListener('DOMContentLoaded', function() {
+  var bookmarkBtn = document.getElementById('novelBookmarkBtn');
+  if (!bookmarkBtn) return;
+
+  var novelUrl = bookmarkBtn.getAttribute('data-novel-url');
+  var bookshelfKey = 'webnovels_bookshelf';
+  var bookshelf = JSON.parse(localStorage.getItem(bookshelfKey) || '[]');
+
+  if (bookshelf.indexOf(novelUrl) !== -1) {
+    bookmarkBtn.classList.add('active');
+    var textEl = bookmarkBtn.querySelector('.bookmark-text');
+    if (textEl) textEl.textContent = 'In Your Bookshelf';
+  }
+
+  bookmarkBtn.addEventListener('click', function() {
+    var shelf = JSON.parse(localStorage.getItem(bookshelfKey) || '[]');
+    var idx = shelf.indexOf(novelUrl);
+    if (idx !== -1) {
+      shelf.splice(idx, 1);
+      bookmarkBtn.classList.remove('active');
+      var t = bookmarkBtn.querySelector('.bookmark-text');
+      if (t) t.textContent = 'Add to Bookshelf';
+    } else {
+      shelf.push(novelUrl);
+      bookmarkBtn.classList.add('active');
+      var t2 = bookmarkBtn.querySelector('.bookmark-text');
+      if (t2) t2.textContent = 'In Your Bookshelf';
+    }
+    localStorage.setItem(bookshelfKey, JSON.stringify(shelf));
+  });
+});
+</script>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {

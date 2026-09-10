@@ -1,0 +1,260 @@
+---
+layout: default
+title: "Search Novels - Find Your Next Read | WebNovels"
+description: "Search hundreds of free online novels by title or genre. Find your next captivating story on WebNovels."
+permalink: /search/
+redirect_from:
+  - /search
+---
+
+<header class="search-header">
+  <div class="container">
+    <h1>Search Novels</h1>
+    <p>Find your next captivating story</p>
+    <div class="search-box-large">
+      <input type="text" id="search-input" placeholder="Enter novel title or genre..." autocomplete="off">
+      <button type="button" id="search-btn"><i class="fa fa-search"></i> Search</button>
+    </div>
+  </div>
+</header>
+
+<main class="search-results-wrapper">
+  <div class="container">
+    <div id="search-results" class="novel-grid">
+      <p class="search-hint">Start typing to search novels...</p>
+    </div>
+    <div id="search-loading" class="search-loading" style="display:none;">
+      <div class="loading-spinner"></div>
+      <p>Loading novels...</p>
+    </div>
+  </div>
+</main>
+
+<style>
+  .search-header {
+    background: linear-gradient(135deg, #3498db, #8e44ad);
+    color: white;
+    padding: 40px 0 30px;
+    text-align: center;
+    margin-bottom: 20px;
+    border-radius: 0 0 15px 15px;
+  }
+  .search-header h1 { font-size: 2.2rem; margin-bottom: 8px; }
+  .search-header p { font-size: 1.1rem; margin-bottom: 20px; opacity: 0.9; }
+  .search-box-large {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    gap: 10px;
+  }
+  .search-box-large input {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 30px;
+    font-size: 1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .search-box-large button {
+    padding: 12px 24px;
+    background: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background 0.3s;
+  }
+  .search-box-large button:hover { background: #1a252f; }
+  .search-results-wrapper { min-height: 400px; }
+  .novel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .novel-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .novel-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+  }
+  .novel-card .cover-placeholder {
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #3498db;
+    color: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+  }
+  .novel-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+  }
+  .novel-card .novel-info { padding: 15px; }
+  .novel-card h3 { font-size: 1rem; margin-bottom: 8px; }
+  .novel-card h3 a { color: #2c3e50; }
+  .novel-card .novel-desc {
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .novel-card .novel-meta {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    display: flex;
+    gap: 10px;
+  }
+  .search-hint, .search-loading {
+    text-align: center;
+    padding: 40px;
+    color: #7f8c8d;
+    grid-column: 1 / -1;
+  }
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f0f0f0;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .no-results {
+    text-align: center;
+    padding: 40px;
+    color: #7f8c8d;
+    grid-column: 1 / -1;
+  }
+</style>
+
+<script>
+(function() {
+  var searchInput = document.getElementById('search-input');
+  var searchBtn = document.getElementById('search-btn');
+  var resultsDiv = document.getElementById('search-results');
+  var loadingDiv = document.getElementById('search-loading');
+  var novels = null;
+  var debounceTimer;
+
+  // Load query param if present
+  var params = new URLSearchParams(window.location.search);
+  var initialQuery = params.get('q');
+  if (initialQuery) {
+    searchInput.value = initialQuery;
+  }
+
+  function loadNovels() {
+    if (novels) return Promise.resolve(novels);
+    loadingDiv.style.display = 'block';
+    resultsDiv.innerHTML = '';
+    return fetch('{{ "/search.json" | relative_url }}')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        novels = data;
+        loadingDiv.style.display = 'none';
+        return novels;
+      })
+      .catch(function(e) {
+        loadingDiv.style.display = 'none';
+        resultsDiv.innerHTML = '<p class="no-results">Error loading novels. Please try again.</p>';
+        return [];
+      });
+  }
+
+  function renderResults(list) {
+    if (!list || list.length === 0) {
+      resultsDiv.innerHTML = '<p class="no-results">No novels found. Try a different keyword.</p>';
+      return;
+    }
+    var html = list.slice(0, 50).map(function(n) {
+      var cover = n.cover_image
+        ? '<img src="' + n.cover_image + '" alt="' + escapeHtml(n.title) + '" loading="lazy">'
+        : '<div class="cover-placeholder">' + escapeHtml(n.title.charAt(0)) + '</div>';
+      var desc = n.description ? escapeHtml(n.description.substring(0, 120)) : '';
+      return '<div class="novel-card">' +
+        '<div class="novel-cover">' + cover + '</div>' +
+        '<div class="novel-info">' +
+          '<h3><a href="' + n.url + '">' + highlightMatch(n.title) + '</a></h3>' +
+          '<p class="novel-desc">' + desc + '</p>' +
+          '<div class="novel-meta">' +
+            '<span><i class="fa fa-tag"></i> ' + escapeHtml(n.genre) + '</span>' +
+            '<span><i class="fa fa-eye"></i> ' + n.views + '</span>' +
+            '<span><i class="fa fa-star"></i> ' + n.rating + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+    resultsDiv.innerHTML = html;
+  }
+
+  var currentQuery = '';
+
+  function highlightMatch(text) {
+    if (!currentQuery) return escapeHtml(text);
+    var escaped = escapeHtml(text);
+    var re = new RegExp('(' + currentQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+    return escaped.replace(re, '<mark>$1</mark>');
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function performSearch(query) {
+    currentQuery = query.trim();
+    if (!currentQuery) {
+      resultsDiv.innerHTML = '<p class="search-hint">Start typing to search novels...</p>';
+      return;
+    }
+    loadNovels().then(function(data) {
+      var q = currentQuery.toLowerCase();
+      var filtered = data.filter(function(n) {
+        return (n.title && n.title.toLowerCase().indexOf(q) !== -1) ||
+               (n.genre && n.genre.toLowerCase().indexOf(q) !== -1) ||
+               (n.description && n.description.toLowerCase().indexOf(q) !== -1);
+      });
+      renderResults(filtered);
+    });
+  }
+
+  // Debounced input
+  searchInput.addEventListener('input', function() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(function() {
+      performSearch(searchInput.value);
+    }, 300);
+  });
+
+  searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      performSearch(searchInput.value);
+    }
+  });
+
+  searchBtn.addEventListener('click', function() {
+    performSearch(searchInput.value);
+  });
+
+  // Trigger initial search if query param present
+  if (initialQuery) {
+    loadNovels().then(function() {
+      performSearch(initialQuery);
+    });
+  }
+})();
+</script>

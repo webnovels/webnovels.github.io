@@ -18,5 +18,19 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <script async type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=68236379a7cb4a00198419bc&product=inline-share-buttons&source=platform" async="async"></script>
+
+  <!-- Microsoft Clarity -->
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "rq025v8j5n");
+    // 显式设置页面路径，修复 URL 维度数据缺失问题
+    clarity("set", "contentPath", "{{ page.url | default: '/' }}");
+    clarity("set", "pageTitle", "{{ page.title | default: 'WebNovels' }}");
+    clarity("set", "pageType", "{{ page.layout | default: 'default' }}");
+  </script>
+  <!-- End Microsoft Clarity -->
   </head>
   
