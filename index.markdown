@@ -10,7 +10,7 @@ description: Discover captivating original novels, web serials, and fiction stor
     <p class="tagline"><strong>2,000+ free novels</strong> updated daily. Betrayal, rebirth, romance & more.</p>
     <div class="search-box">
       <input type="text" id="novel-search" placeholder="Search novels by title or genre...">
-      <button type="button" aria-label="Search" onclick="var q=document.getElementById('novel-search').value.trim(); if(q) window.location.href='/search/?q='+encodeURIComponent(q); else document.getElementById('novel-search').focus()"><i class="fa fa-search"></i></button>
+      <button type="button" aria-label="Search" onclick="var q=document.getElementById('novel-search').value.trim(); if(q){if(window.trackEvent)trackEvent('search_performed',{search_term:q,source:'homepage'});window.location.href='/search/?q='+encodeURIComponent(q);}else document.getElementById('novel-search').focus()"><i class="fa fa-search"></i></button>
     </div>
 
     <!-- 热门小说直接入口 - 第一屏即可点击 -->
@@ -67,6 +67,20 @@ description: Discover captivating original novels, web serials, and fiction stor
     </div>
   </div>
 </section>
+
+  <!-- Rankings Link Banner -->
+  <section class="rankings-banner">
+    <div class="container">
+      <a href="{{ '/rankings/' | relative_url }}" class="rankings-link">
+        <span class="rankings-icon"><i class="fa fa-trophy"></i></span>
+        <span class="rankings-text">
+          <strong>View Novel Rankings</strong>
+          <small>Top 100 novels by popularity & rating</small>
+        </span>
+        <span class="rankings-arrow"><i class="fa fa-chevron-right"></i></span>
+      </a>
+    </div>
+  </section>
 
   <!-- Browse by Genre -->
   <section id="genres" class="genre-section">
@@ -396,6 +410,30 @@ description: Discover captivating original novels, web serials, and fiction stor
   .hero-trending .trending-sep {
     color: rgba(255, 255, 255, 0.4);
   }
+
+  /* Rankings banner */
+  .rankings-banner { padding: 0; }
+  .rankings-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px 25px;
+    background: linear-gradient(135deg, #0f3460, #1a1a2e);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .rankings-link:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(15,52,96,0.3); }
+  .rankings-icon {
+    font-size: 2rem;
+    color: #ffd700;
+    flex-shrink: 0;
+  }
+  .rankings-text { flex: 1; }
+  .rankings-text strong { font-size: 1.15rem; display: block; }
+  .rankings-text small { font-size: 0.85rem; opacity: 0.7; }
+  .rankings-arrow { font-size: 1.2rem; opacity: 0.6; }
 
   .mobile-nav {
     background: white;
@@ -1179,9 +1217,32 @@ description: Discover captivating original novels, web serials, and fiction stor
         if (e.key === 'Enter') {
           const query = this.value.trim();
           if (query) {
+            if (window.trackEvent) trackEvent('search_performed', { search_term: query, source: 'homepage' });
             window.location.href = '{{ "/search/" | relative_url }}?q=' + encodeURIComponent(query);
           }
         }
+      });
+    }
+
+    // Track trending novel clicks
+    document.querySelectorAll('.trending-link').forEach(function(link) {
+      link.addEventListener('click', function() {
+        if (window.trackEvent) trackEvent('trending_clicked', { novel_title: this.textContent.trim(), source: 'homepage_hero' });
+      });
+    });
+
+    // Track genre tag clicks
+    document.querySelectorAll('.genre-tag').forEach(function(tag) {
+      tag.addEventListener('click', function() {
+        if (window.trackEvent) trackEvent('genre_clicked', { genre: this.textContent.trim(), source: 'homepage' });
+      });
+    });
+
+    // Track rankings banner click
+    var rankingsLink = document.querySelector('.rankings-link');
+    if (rankingsLink) {
+      rankingsLink.addEventListener('click', function() {
+        if (window.trackEvent) trackEvent('rankings_viewed', { source: 'homepage_banner' });
       });
     }
     

@@ -32,5 +32,24 @@
     clarity("set", "pageType", "{{ page.layout | default: 'default' }}");
   </script>
   <!-- End Microsoft Clarity -->
+
+  <!-- 统一事件追踪：GA4 + Clarity -->
+  <script>
+  window.trackEvent = function(eventName, params) {
+    params = params || {};
+    // GA4 事件（通过 GTM dataLayer）
+    if (typeof dataLayer !== 'undefined') {
+      dataLayer.push({ event: eventName, ...params });
+    }
+    // Clarity 事件
+    if (typeof clarity === 'function') {
+      clarity("event", eventName);
+      Object.keys(params).forEach(function(k) {
+        clarity("set", k, String(params[k]));
+      });
+    }
+  };
+  </script>
+  <!-- End 统一事件追踪 -->
   </head>
   

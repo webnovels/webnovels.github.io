@@ -295,6 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
           var shelf = JSON.parse(localStorage.getItem(bookshelfKey) || '[]');
           shelf = shelf.filter(function(u) { return u !== url; });
           localStorage.setItem(bookshelfKey, JSON.stringify(shelf));
+          if (window.trackEvent) trackEvent('bookmark_removed', { novel_url: url, source: 'bookshelf_page' });
 
           // 动画移除
           card.style.transition = 'opacity 0.3s, transform 0.3s';

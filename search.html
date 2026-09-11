@@ -228,6 +228,7 @@ redirect_from:
                (n.genre && n.genre.toLowerCase().indexOf(q) !== -1) ||
                (n.description && n.description.toLowerCase().indexOf(q) !== -1);
       });
+      if (window.trackEvent) trackEvent('search_performed', { search_term: currentQuery, result_count: filtered.length, source: 'search_page' });
       renderResults(filtered);
     });
   }

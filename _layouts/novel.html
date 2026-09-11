@@ -423,16 +423,19 @@ document.addEventListener('DOMContentLoaded', function() {
   bookmarkBtn.addEventListener('click', function() {
     var shelf = JSON.parse(localStorage.getItem(bookshelfKey) || '[]');
     var idx = shelf.indexOf(novelUrl);
+    var novelTitle = '{{ page.title | escape }}';
     if (idx !== -1) {
       shelf.splice(idx, 1);
       bookmarkBtn.classList.remove('active');
       var t = bookmarkBtn.querySelector('.bookmark-text');
       if (t) t.textContent = 'Add to Bookshelf';
+      if (window.trackEvent) trackEvent('bookmark_removed', { novel_url: novelUrl, novel_title: novelTitle });
     } else {
       shelf.push(novelUrl);
       bookmarkBtn.classList.add('active');
       var t2 = bookmarkBtn.querySelector('.bookmark-text');
       if (t2) t2.textContent = 'In Your Bookshelf';
+      if (window.trackEvent) trackEvent('bookmark_added', { novel_url: novelUrl, novel_title: novelTitle });
     }
     localStorage.setItem(bookshelfKey, JSON.stringify(shelf));
   });

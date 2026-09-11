@@ -1,0 +1,328 @@
+---
+layout: default
+title: "Best Novels Ranking - Top Rated & Most Read Novels | WebNovels"
+description: "Discover the best novels ranked by popularity, rating, and reader engagement. Browse top 100 novels, most read stories, and highest rated fiction. Updated daily!"
+permalink: /rankings/
+redirect_from:
+  - /ranking/
+  - /top-novels/
+  - /best-novels/
+---
+
+<header class="rankings-header">
+  <div class="container">
+    <nav class="breadcrumbs">
+      <a href="{{ '/' | relative_url }}">Home</a> &gt;
+      <span>Rankings</span>
+    </nav>
+    <h1 class="rankings-title">Novel Rankings</h1>
+    <p class="rankings-subtitle">Discover the best novels by popularity, rating, and reader engagement. Updated daily.</p>
+  </div>
+</header>
+
+<main class="rankings-wrapper">
+  <div class="container">
+    <!-- 排行榜 Tab 切换 -->
+    <div class="rankings-tabs">
+      <button class="tab-btn active" data-tab="popular" onclick="switchTab('popular')">
+        <i class="fa fa-fire"></i> Most Popular
+      </button>
+      <button class="tab-btn" data-tab="rating" onclick="switchTab('rating')">
+        <i class="fa fa-star"></i> Highest Rated
+      </button>
+      <button class="tab-btn" data-tab="completed" onclick="switchTab('completed')">
+        <i class="fa fa-check-circle"></i> Best Completed
+      </button>
+    </div>
+
+    <!-- Top 3 领奖台 -->
+    <section class="podium" id="podium-section">
+      <div class="podium-slot podium-2" id="podium-2">
+        <div class="podium-rank">2</div>
+        <div class="podium-info"><span class="podium-title">Loading...</span></div>
+      </div>
+      <div class="podium-slot podium-1" id="podium-1">
+        <div class="podium-rank"><i class="fa fa-crown"></i></div>
+        <div class="podium-info"><span class="podium-title">Loading...</span></div>
+      </div>
+      <div class="podium-slot podium-3" id="podium-3">
+        <div class="podium-rank">3</div>
+        <div class="podium-info"><span class="podium-title">Loading...</span></div>
+      </div>
+    </section>
+
+    <!-- 排行榜列表 -->
+    <section class="ranking-list" id="ranking-list">
+      <div class="loading-state">
+        <i class="fa fa-spinner fa-spin"></i> Loading rankings...
+      </div>
+    </section>
+  </div>
+</main>
+
+<style>
+  .rankings-header {
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    color: white;
+    padding: 50px 0 40px;
+    text-align: center;
+  }
+  .rankings-header .breadcrumbs { margin-bottom: 15px; font-size: 0.9rem; }
+  .rankings-header .breadcrumbs a { color: rgba(255,255,255,0.7); }
+  .rankings-header .breadcrumbs a:hover { color: white; }
+  .rankings-title { font-size: 2.5rem; margin-bottom: 10px; }
+  .rankings-subtitle { font-size: 1.05rem; opacity: 0.85; max-width: 700px; margin: 0 auto; }
+
+  .rankings-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    padding: 10px 20px;
+    border: 2px solid #0f3460;
+    background: white;
+    color: #0f3460;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tab-btn.active {
+    background: #0f3460;
+    color: white;
+  }
+  .tab-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(15,52,96,0.2);
+  }
+
+  .podium {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 15px;
+    margin: 40px 0;
+  }
+  .podium-slot {
+    text-align: center;
+    border-radius: 8px 8px 0 0;
+    padding: 20px 15px;
+    min-width: 180px;
+    transition: transform 0.3s;
+  }
+  .podium-slot:hover { transform: scale(1.05); }
+  .podium-1 {
+    background: linear-gradient(135deg, #ffd700, #ffaa00);
+    color: #1a1a2e;
+    height: 200px;
+  }
+  .podium-2 {
+    background: linear-gradient(135deg, #c0c0c0, #999);
+    color: #1a1a2e;
+    height: 160px;
+  }
+  .podium-3 {
+    background: linear-gradient(135deg, #cd7f32, #b87333);
+    color: #1a1a2e;
+    height: 140px;
+  }
+  .podium-rank {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  .podium-info { font-size: 0.85rem; }
+  .podium-info a { color: inherit; text-decoration: none; font-weight: 600; }
+  .podium-info a:hover { text-decoration: underline; }
+
+  .ranking-list { margin-top: 30px; }
+  .ranking-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .ranking-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  }
+  .ranking-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0f3460;
+    min-width: 40px;
+    text-align: center;
+  }
+  .ranking-cover {
+    width: 50px;
+    height: 70px;
+    border-radius: 4px;
+    background: #0f3460;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .ranking-cover img { width: 100%; height: 100%; object-fit: cover; }
+  .ranking-info { flex: 1; min-width: 0; }
+  .ranking-info h3 { font-size: 1rem; margin-bottom: 4px; }
+  .ranking-info h3 a { color: #1a1a2e; text-decoration: none; }
+  .ranking-info h3 a:hover { color: #0f3460; }
+  .ranking-desc {
+    font-size: 0.82rem;
+    color: #666;
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ranking-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.78rem;
+    color: #888;
+    flex-wrap: wrap;
+  }
+  .ranking-meta .meta-rating { color: #f39c12; font-weight: 500; }
+  .ranking-meta .meta-views { color: #e65100; }
+  .ranking-status-badge {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 500;
+  }
+  .ranking-status-badge.completed { background: #e8f5e9; color: #2e7d32; }
+  .ranking-status-badge.ongoing { background: #fff3e0; color: #e65100; }
+
+  .loading-state {
+    text-align: center;
+    padding: 40px;
+    color: #888;
+    font-size: 1.1rem;
+  }
+  @media (max-width: 768px) {
+    .podium { flex-direction: column; align-items: center; }
+    .podium-1, .podium-2, .podium-3 { width: 90%; height: auto; min-height: 100px; }
+    .ranking-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .ranking-meta { flex-direction: column; gap: 4px; }
+  }
+</style>
+
+<script>
+var allNovels = [];
+var currentTab = 'popular';
+
+document.addEventListener('DOMContentLoaded', function() {
+  fetch('{{ "/search.json" | relative_url }}')
+    .then(function(r) { return r.json(); })
+    .then(function(novels) {
+      allNovels = novels;
+      renderRanking('popular');
+    })
+    .catch(function(e) {
+      document.getElementById('ranking-list').innerHTML =
+        '<div class="loading-state"><i class="fa fa-exclamation-triangle"></i> Failed to load rankings.</div>';
+    });
+});
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
+  if (window.trackEvent) trackEvent('ranking_tab_switch', { tab: tab });
+  renderRanking(tab);
+}
+
+function renderRanking(type) {
+  var sorted;
+  if (type === 'rating') {
+    sorted = allNovels.slice().sort(function(a, b) {
+      return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
+    });
+  } else if (type === 'completed') {
+    sorted = allNovels.filter(function(n) {
+      return n.status && n.status.toLowerCase().includes('complete');
+    }).sort(function(a, b) {
+      return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
+    });
+    if (sorted.length === 0) {
+      sorted = allNovels.slice().sort(function(a, b) {
+        return (parseFloat(b.views) || 0) - (parseFloat(a.views) || 0);
+      });
+    }
+  } else {
+    sorted = allNovels.slice().sort(function(a, b) {
+      return (parseInt(b.views) || 0) - (parseInt(a.views) || 0);
+    });
+  }
+
+  var top3 = sorted.slice(0, 3);
+  var rest = sorted.slice(3, 100);
+
+  // 领奖台
+  var podiumHtml = '';
+  var podiumOrder = [1, 0, 2]; // 显示顺序：2nd, 1st, 3rd
+  for (var pi = 0; pi < 3; pi++) {
+    var idx = podiumOrder[pi];
+    var slot = document.getElementById('podium-' + (pi + 1));
+    if (top3[idx]) {
+      var n = top3[idx];
+      slot.querySelector('.podium-info').innerHTML =
+        '<a href="' + n.url + '">' + escapeHtml(n.title) + '</a><br><small>' +
+        (n.rating ? '★ ' + n.rating : '') + ' · ' + (n.views ? n.views + ' reads' : '') + '</small>';
+    }
+  }
+
+  // 列表 4-100
+  var html = '';
+  rest.forEach(function(novel, i) {
+    var rank = i + 4;
+    var cover = novel.cover_image
+      ? '<img src="' + novel.cover_image + '" alt="' + escapeHtml(novel.title) + '" loading="lazy">'
+      : escapeHtml(novel.title.charAt(0));
+    var statusBadge = novel.status
+      ? '<span class="ranking-status-badge ' + (novel.status.toLowerCase().includes('complete') ? 'completed' : 'ongoing') + '">' + novel.status + '</span>'
+      : '';
+    var desc = novel.description ? escapeHtml(novel.description.substring(0, 100)) : '';
+
+    html += '<div class="ranking-item">' +
+      '<div class="ranking-number">' + rank + '</div>' +
+      '<div class="ranking-cover">' + cover + '</div>' +
+      '<div class="ranking-info">' +
+        '<h3><a href="' + novel.url + '">' + escapeHtml(novel.title) + '</a></h3>' +
+        '<div class="ranking-desc">' + desc + '</div>' +
+        '<div class="ranking-meta">' +
+          (novel.genre ? '<span><i class="fa fa-tag"></i> ' + escapeHtml(novel.genre) + '</span>' : '') +
+          (novel.rating ? '<span class="meta-rating"><i class="fa fa-star"></i> ' + novel.rating + '</span>' : '') +
+          (novel.views ? '<span class="meta-views"><i class="fa fa-eye"></i> ' + novel.views + ' reads</span>' : '') +
+          statusBadge +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  });
+
+  document.getElementById('ranking-list').innerHTML = html;
+}
+
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
