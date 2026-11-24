@@ -224,21 +224,38 @@ redirect_from:
   }
 </style>
 
+<script src="{{ '/assets/js/supabase.js' | relative_url }}"></script>
 <script>
-var allNovels = [];
+var allNovels = [];        // 静态缓存（回退用）
 var currentTab = 'popular';
+var useSupabase = null;
+
+function detectBackend() {
+  if (useSupabase !== null) return Promise.resolve(useSupabase);
+  return NovelDB.ready.then(function (client) {
+    useSupabase = !!client;
+    return useSupabase;
+  }).catch(function () { useSupabase = false; return false; });
+}
 
 document.addEventListener('DOMContentLoaded', function() {
-  fetch('{{ "/search.json" | relative_url }}')
-    .then(function(r) { return r.json(); })
-    .then(function(novels) {
-      allNovels = novels;
+  detectBackend().then(function (useSb) {
+    if (useSb) {
       renderRanking('popular');
-    })
-    .catch(function(e) {
-      document.getElementById('ranking-list').innerHTML =
-        '<div class="loading-state"><i class="fa fa-exclamation-triangle"></i> Failed to load rankings.</div>';
-    });
+    } else {
+      // 回退：加载 search.json
+      fetch('{{ "/search.json" | relative_url }}')
+        .then(function(r) { return r.json(); })
+        .then(function(novels) {
+          allNovels = novels;
+          renderRanking('popular');
+        })
+        .catch(function(e) {
+          document.getElementById('ranking-list').innerHTML =
+            '<div class="loading-state"><i class="fa fa-exclamation-triangle"></i> Failed to load rankings.</div>';
+        });
+    }
+  });
 });
 
 function switchTab(tab) {
@@ -250,74 +267,88 @@ function switchTab(tab) {
 }
 
 function renderRanking(type) {
-  var sorted;
-  if (type === 'rating') {
-    sorted = allNovels.slice().sort(function(a, b) {
-      return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
-    });
-  } else if (type === 'completed') {
-    sorted = allNovels.filter(function(n) {
-      return n.status && n.status.toLowerCase().includes('complete');
-    }).sort(function(a, b) {
-      return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
-    });
-    if (sorted.length === 0) {
+  // 先显示 loading
+  document.getElementById('ranking-list').innerHTML =
+    '<div class="loading-state"><i class="fa fa-spinner fa-spin"></i> Loading rankings...</div>';
+
+  var dataPromise;
+  if (useSupabase) {
+    dataPromise = NovelDB.rankings(type, 100);
+  } else {
+    // 回退：本地排序
+    var sorted;
+    if (type === 'rating') {
       sorted = allNovels.slice().sort(function(a, b) {
-        return (parseFloat(b.views) || 0) - (parseFloat(a.views) || 0);
+        return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
+      });
+    } else if (type === 'completed') {
+      sorted = allNovels.filter(function(n) {
+        return n.status && n.status.toLowerCase().includes('complete');
+      }).sort(function(a, b) {
+        return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
+      });
+      if (sorted.length === 0) {
+        sorted = allNovels.slice().sort(function(a, b) {
+          return (parseFloat(b.views) || 0) - (parseInt(a.views) || 0);
+        });
+      }
+    } else {
+      sorted = allNovels.slice().sort(function(a, b) {
+        return (parseInt(b.views) || 0) - (parseInt(a.views) || 0);
       });
     }
-  } else {
-    sorted = allNovels.slice().sort(function(a, b) {
-      return (parseInt(b.views) || 0) - (parseInt(a.views) || 0);
-    });
+    dataPromise = Promise.resolve(sorted);
   }
 
-  var top3 = sorted.slice(0, 3);
-  var rest = sorted.slice(3, 100);
+  dataPromise.then(function (sorted) {
+    if (window.trackEvent) trackEvent('ranking_rendered', { tab: type, count: sorted.length, backend: useSupabase ? 'supabase' : 'static' });
 
-  // 领奖台
-  var podiumHtml = '';
-  var podiumOrder = [1, 0, 2]; // 显示顺序：2nd, 1st, 3rd
-  for (var pi = 0; pi < 3; pi++) {
-    var idx = podiumOrder[pi];
-    var slot = document.getElementById('podium-' + (pi + 1));
-    if (top3[idx]) {
-      var n = top3[idx];
-      slot.querySelector('.podium-info').innerHTML =
-        '<a href="' + n.url + '">' + escapeHtml(n.title) + '</a><br><small>' +
-        (n.rating ? '★ ' + n.rating : '') + ' · ' + (n.views ? n.views + ' reads' : '') + '</small>';
+    var top3 = sorted.slice(0, 3);
+    var rest = sorted.slice(3, 100);
+
+    // 领奖台
+    var podiumOrder = [1, 0, 2];
+    for (var pi = 0; pi < 3; pi++) {
+      var idx = podiumOrder[pi];
+      var slot = document.getElementById('podium-' + (pi + 1));
+      if (top3[idx]) {
+        var n = top3[idx];
+        slot.querySelector('.podium-info').innerHTML =
+          '<a href="' + n.url + '">' + escapeHtml(n.title) + '</a><br><small>' +
+          (n.rating ? '★ ' + n.rating : '') + ' · ' + (n.views ? n.views + ' reads' : '') + '</small>';
+      }
     }
-  }
 
-  // 列表 4-100
-  var html = '';
-  rest.forEach(function(novel, i) {
-    var rank = i + 4;
-    var cover = novel.cover_image
-      ? '<img src="' + novel.cover_image + '" alt="' + escapeHtml(novel.title) + '" loading="lazy">'
-      : escapeHtml(novel.title.charAt(0));
-    var statusBadge = novel.status
-      ? '<span class="ranking-status-badge ' + (novel.status.toLowerCase().includes('complete') ? 'completed' : 'ongoing') + '">' + novel.status + '</span>'
-      : '';
-    var desc = novel.description ? escapeHtml(novel.description.substring(0, 100)) : '';
+    // 列表 4-100
+    var html = '';
+    rest.forEach(function(novel, i) {
+      var rank = i + 4;
+      var cover = novel.cover_image
+        ? '<img src="' + novel.cover_image + '" alt="' + escapeHtml(novel.title) + '" loading="lazy">'
+        : escapeHtml(novel.title.charAt(0));
+      var statusBadge = novel.status
+        ? '<span class="ranking-status-badge ' + (novel.status.toLowerCase().includes('complete') ? 'completed' : 'ongoing') + '">' + novel.status + '</span>'
+        : '';
+      var desc = novel.description ? escapeHtml(novel.description.substring(0, 100)) : '';
 
-    html += '<div class="ranking-item">' +
-      '<div class="ranking-number">' + rank + '</div>' +
-      '<div class="ranking-cover">' + cover + '</div>' +
-      '<div class="ranking-info">' +
-        '<h3><a href="' + novel.url + '">' + escapeHtml(novel.title) + '</a></h3>' +
-        '<div class="ranking-desc">' + desc + '</div>' +
-        '<div class="ranking-meta">' +
-          (novel.genre ? '<span><i class="fa fa-tag"></i> ' + escapeHtml(novel.genre) + '</span>' : '') +
-          (novel.rating ? '<span class="meta-rating"><i class="fa fa-star"></i> ' + novel.rating + '</span>' : '') +
-          (novel.views ? '<span class="meta-views"><i class="fa fa-eye"></i> ' + novel.views + ' reads</span>' : '') +
-          statusBadge +
+      html += '<div class="ranking-item">' +
+        '<div class="ranking-number">' + rank + '</div>' +
+        '<div class="ranking-cover">' + cover + '</div>' +
+        '<div class="ranking-info">' +
+          '<h3><a href="' + novel.url + '">' + escapeHtml(novel.title) + '</a></h3>' +
+          '<div class="ranking-desc">' + desc + '</div>' +
+          '<div class="ranking-meta">' +
+            (novel.genre ? '<span><i class="fa fa-tag"></i> ' + escapeHtml(novel.genre) + '</span>' : '') +
+            (novel.rating ? '<span class="meta-rating"><i class="fa fa-star"></i> ' + novel.rating + '</span>' : '') +
+            (novel.views ? '<span class="meta-views"><i class="fa fa-eye"></i> ' + novel.views + ' reads</span>' : '') +
+            statusBadge +
+          '</div>' +
         '</div>' +
-      '</div>' +
-    '</div>';
-  });
+      '</div>';
+    });
 
-  document.getElementById('ranking-list').innerHTML = html;
+    document.getElementById('ranking-list').innerHTML = html || '<div class="loading-state">No novels found.</div>';
+  });
 }
 
 function escapeHtml(str) {

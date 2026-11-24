@@ -19,50 +19,13 @@ permalink: /genre/realistic/
   </div>
 </header>
 
-{% assign novel_indexes = "" | split: ',' %}
-        {% for item in site.novels %}
-          {% assign url_parts = item.url | split: '/' %}
-          {% if url_parts.size == 3 and item.genre == 'Realistic' %}
-            {% assign novel_indexes = novel_indexes | push: item %}
-          {% endif %}
-        {% endfor %}
-
 <main class="content-wrapper">
   <!-- Popular in This Genre -->
   <section class="popular-in-genre">
     <div class="container">
       <h2>Popular in Realistic Fiction</h2>
-      <div class="novel-carousel">
-        {% assign genre_novels = novel_indexes | sort: "views" | reverse | limit: 5 %}
-        {% for novel in genre_novels %}
-          <div class="novel-card">
-            <div class="novel-cover">
-              {% if novel.cover_image %}
-                {% include picture.html img=novel.cover_image alt= novel.title  %}
-              {% else %}
-                <div class="cover-placeholder">{{ novel.title | slice: 0, 1 }}</div>
-              {% endif %}
-              {% if novel.completed %}
-                <span class="status-tag completed">Completed</span>
-              {% else %}
-                <span class="status-tag ongoing">Ongoing</span>
-              {% endif %}
-            </div>
-            <div class="novel-info">
-              <h3><a href="{{ novel.url | relative_url }}">{{ novel.title }}</a></h3>
-              <div class="novel-meta">
-                <span class="author">By {{ novel.author | default: "Anonymous" }}</span>
-                <span class="rating"><i class="fa fa-star"></i> {{ novel.rating | default: "4.3" }}</span>
-              </div>
-              <p class="novel-excerpt">{{ novel.excerpt | strip_html | truncate: 90 }}</p>
-              <div class="novel-stats">
-                <span><i class="fa fa-book"></i> {{ novel.chapter_count | default: "15" }} Chapters</span>
-                <span><i class="fa fa-eye"></i> {{ novel.views | default: "1250" }}</span>
-              </div>
-              <a href="{{ novel.url | relative_url }}" class="read-btn">Read Now</a>
-            </div>
-          </div>
-        {% endfor %}
+      <div class="novel-carousel" id="genre-popular">
+        <div class="loading-state">Loading novels...</div>
       </div>
     </div>
   </section>
@@ -121,45 +84,9 @@ permalink: /genre/realistic/
 
       
       
-      <div class="novel-grid" id="novels-container">
-       
-        {% for novel in novel_indexes %}
-          <div class="novel-card">
-            <div class="novel-cover">
-              {% if novel.cover_image %}
-                {% include picture.html img=novel.cover_image alt= novel.title  %}
-              {% else %}
-                <div class="cover-placeholder">{{ novel.title | slice: 0, 1 }}</div>
-              {% endif %}
-              {% if novel.completed %}
-                <span class="status-tag completed">Completed</span>
-              {% else %}
-                <span class="status-tag ongoing">Ongoing</span>
-              {% endif %}
-            </div>
-            <div class="novel-info">
-              <h3><a href="{{ novel.url | relative_url }}">{{ novel.title }}</a></h3>
-              <div class="novel-meta">
-                <span class="author">By {{ novel.author | default: "Anonymous" }}</span>
-                <span class="rating"><i class="fa fa-star"></i> {{ novel.rating | default: "4.2" }}</span>
-              </div>
-              <div class="tags">
-                {% for subgenre in novel.subgenres limit: 2 %}
-                  <span class="tag">{{ subgenre }}</span>
-                {% endfor %}
-              </div>
-              <p class="novel-excerpt">{{ novel.excerpt | strip_html | truncate: 80 }}</p>
-              <div class="novel-stats">
-                <span><i class="fa fa-book"></i> {{ novel.chapter_count | default: "12" }} Chapters</span>
-                <span><i class="fa fa-eye"></i> {{ novel.views | default: "840" }}</span>
-                <span><i class="fa fa-calendar"></i> Updated {{ novel.last_updated | default: "2023-04-05" | date: "%b %d" }}</span>
-              </div>
-              <a href="{{ novel.url | relative_url }}" class="read-btn">Read Now</a>
-            </div>
-          </div>
-        {% endfor %}
+      <div class="novel-grid" id="genre-all">
+        <div class="loading-state">Loading novels...</div>
       </div>
-      
       <!-- <div class="pagination">
         <a href="#" class="page-btn active">1</a>
         <a href="#" class="page-btn">2</a>
@@ -788,11 +715,13 @@ permalink: /genre/realistic/
 </style>
 
 <!-- Add JavaScript for interactive elements -->
+<script src="/assets/js/supabase.js"></script>
+<script src="/assets/js/genre-page.js" data-genre="Realistic"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   // View toggle functionality
   const viewButtons = document.querySelectorAll('.view-btn');
-  const novelsContainer = document.getElementById('novels-container');
+  const novelsContainer = document.getElementById('genre-all');
   
   viewButtons.forEach(button => {
     button.addEventListener('click', function() {

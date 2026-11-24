@@ -140,38 +140,39 @@ redirect_from:
   }
 </style>
 
+<script src="{{ '/assets/js/supabase.js' | relative_url }}"></script>
 <script>
 (function() {
   var searchInput = document.getElementById('search-input');
   var searchBtn = document.getElementById('search-btn');
   var resultsDiv = document.getElementById('search-results');
   var loadingDiv = document.getElementById('search-loading');
-  var novels = null;
+  var novels = null;           // 静态 search.json 缓存（回退用）
+  var useSupabase = null;      // null=未检测, true=用Supabase, false=回退
   var debounceTimer;
 
-  // Load query param if present
   var params = new URLSearchParams(window.location.search);
   var initialQuery = params.get('q');
-  if (initialQuery) {
-    searchInput.value = initialQuery;
+  if (initialQuery) searchInput.value = initialQuery;
+
+  // 检测是否使用 Supabase（配置了 URL 且库加载成功）
+  function detectBackend() {
+    if (useSupabase !== null) return Promise.resolve(useSupabase);
+    return NovelDB.ready.then(function (client) {
+      useSupabase = !!client;
+      return useSupabase;
+    }).catch(function () {
+      useSupabase = false;
+      return false;
+    });
   }
 
-  function loadNovels() {
+  // 加载静态 search.json（回退方案）
+  function loadNovelsStatic() {
     if (novels) return Promise.resolve(novels);
-    loadingDiv.style.display = 'block';
-    resultsDiv.innerHTML = '';
     return fetch('{{ "/search.json" | relative_url }}')
       .then(function(r) { return r.json(); })
-      .then(function(data) {
-        novels = data;
-        loadingDiv.style.display = 'none';
-        return novels;
-      })
-      .catch(function(e) {
-        loadingDiv.style.display = 'none';
-        resultsDiv.innerHTML = '<p class="no-results">Error loading novels. Please try again.</p>';
-        return [];
-      });
+      .then(function(data) { novels = data; return novels; });
   }
 
   function renderResults(list) {
@@ -221,41 +222,47 @@ redirect_from:
       resultsDiv.innerHTML = '<p class="search-hint">Start typing to search novels...</p>';
       return;
     }
-    loadNovels().then(function(data) {
-      var q = currentQuery.toLowerCase();
-      var filtered = data.filter(function(n) {
-        return (n.title && n.title.toLowerCase().indexOf(q) !== -1) ||
-               (n.genre && n.genre.toLowerCase().indexOf(q) !== -1) ||
-               (n.description && n.description.toLowerCase().indexOf(q) !== -1);
-      });
-      if (window.trackEvent) trackEvent('search_performed', { search_term: currentQuery, result_count: filtered.length, source: 'search_page' });
-      renderResults(filtered);
+
+    loadingDiv.style.display = 'block';
+    resultsDiv.innerHTML = '';
+
+    detectBackend().then(function (useSb) {
+      if (useSb) {
+        // Supabase 路径：直接模糊查询
+        return NovelDB.search(currentQuery, 50).then(function (list) {
+          loadingDiv.style.display = 'none';
+          if (window.trackEvent) trackEvent('search_performed', { search_term: currentQuery, result_count: list.length, source: 'search_page', backend: 'supabase' });
+          renderResults(list);
+        });
+      } else {
+        // 回退路径：加载 search.json 后本地过滤
+        return loadNovelsStatic().then(function (data) {
+          loadingDiv.style.display = 'none';
+          var q = currentQuery.toLowerCase();
+          var filtered = data.filter(function (n) {
+            return (n.title && n.title.toLowerCase().indexOf(q) !== -1) ||
+                   (n.genre && n.genre.toLowerCase().indexOf(q) !== -1) ||
+                   (n.description && n.description.toLowerCase().indexOf(q) !== -1);
+          });
+          if (window.trackEvent) trackEvent('search_performed', { search_term: currentQuery, result_count: filtered.length, source: 'search_page', backend: 'static' });
+          renderResults(filtered);
+        });
+      }
+    }).catch(function () {
+      loadingDiv.style.display = 'none';
+      resultsDiv.innerHTML = '<p class="no-results">Error loading novels. Please try again.</p>';
     });
   }
 
-  // Debounced input
   searchInput.addEventListener('input', function() {
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(function() {
-      performSearch(searchInput.value);
-    }, 300);
+    debounceTimer = setTimeout(function() { performSearch(searchInput.value); }, 300);
   });
-
   searchInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-      performSearch(searchInput.value);
-    }
+    if (e.key === 'Enter') performSearch(searchInput.value);
   });
+  searchBtn.addEventListener('click', function() { performSearch(searchInput.value); });
 
-  searchBtn.addEventListener('click', function() {
-    performSearch(searchInput.value);
-  });
-
-  // Trigger initial search if query param present
-  if (initialQuery) {
-    loadNovels().then(function() {
-      performSearch(initialQuery);
-    });
-  }
+  if (initialQuery) performSearch(initialQuery);
 })();
 </script>

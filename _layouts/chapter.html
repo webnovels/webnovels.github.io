@@ -12,17 +12,23 @@ layout: default
     {{ content }}
   </div>
 
-  <div class="chapter-navigation">
+  <div class="chapter-navigation" id="chapterNav">
     {% if page.previous_chapter %}
-      <a href="{{ page.previous_chapter | relative_url }}" class="prev-link">&laquo; Previous</a>
+      <a href="{{ page.previous_chapter | relative_url }}" class="prev-link" id="prevLink">&laquo; Previous</a>
+    {% else %}
+      <a href="#" class="prev-link" id="prevLink" style="visibility:hidden;">&laquo; Previous</a>
     {% endif %}
 
     <a href="{{ page.novel_index | relative_url }}" class="index-link">Contents</a>
 
     {% if page.next_chapter %}
-      <a href="{{ page.next_chapter | relative_url }}" class="next-link">Next &raquo;</a>
+      <a href="{{ page.next_chapter | relative_url }}" class="next-link" id="nextLink">Next &raquo;</a>
+    {% else %}
+      <a href="#" class="next-link" id="nextLink" style="visibility:hidden;">Next &raquo;</a>
     {% endif %}
   </div>
+
+  <div class="chapter-progress" id="chapterProgress"></div>
 
   <!-- 加入书架按钮 -->
   <div class="bookmark-bar">
@@ -104,6 +110,15 @@ layout: default
     transition: color 0.3s;
   }
   .view-bookshelf-link:hover { color: #3498db; }
+  .chapter-progress {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #95a5a6;
+    margin-bottom: 25px;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+  }
 </style>
 
 <script>
@@ -150,4 +165,75 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+</script>
+
+<script src="/assets/js/supabase.js"></script>
+<script>
+// 动态章节导航 + 阅读进度（基于 Supabase）
+// 正文内容仍为静态渲染（保证 SEO），仅导航链接和进度从数据库动态获取
+(function () {
+  var path = window.location.pathname;
+  // URL 模式: /novels/<novelId>/<chapterNumber>/
+  var m = path.match(/\/novels\/(\d+)\/(\d+)\/?/);
+  if (!m) return;
+
+  var novelId = parseInt(m[1], 10);
+  var chapterNumber = parseInt(m[2], 10);
+
+  var prevLink = document.getElementById('prevLink');
+  var nextLink = document.getElementById('nextLink');
+  var progressEl = document.getElementById('chapterProgress');
+
+  // 记录阅读进度到 localStorage
+  var progressKey = 'webnovels_reading_progress';
+  try {
+    var progress = JSON.parse(localStorage.getItem(progressKey) || '{}');
+    var existing = progress[novelId] || {};
+    // 只在新章节号更大时更新（避免回退覆盖）
+    if (!existing.chapter || chapterNumber >= existing.chapter) {
+      progress[novelId] = {
+        chapter: chapterNumber,
+        url: path,
+        updated: Date.now()
+      };
+      localStorage.setItem(progressKey, JSON.stringify(progress));
+    }
+  } catch (e) {}
+
+  if (!window.NovelDB) return;
+
+  // 从 Supabase 获取上一章/下一章
+  NovelDB.ready.then(function () {
+    return NovelDB.getAdjacentChapters(novelId, chapterNumber);
+  }).then(function (adj) {
+    // 更新上一章链接
+    if (adj.prev) {
+      prevLink.href = '/novels/' + novelId + '/' + adj.prev.chapter_number + '/';
+      prevLink.style.visibility = 'visible';
+      prevLink.innerHTML = '&laquo; ' + (adj.prev.title || ('Chapter ' + adj.prev.chapter_number));
+    } else {
+      prevLink.style.visibility = 'hidden';
+    }
+
+    // 更新下一章链接
+    if (adj.next) {
+      nextLink.href = '/novels/' + novelId + '/' + adj.next.chapter_number + '/';
+      nextLink.style.visibility = 'visible';
+      nextLink.innerHTML = (adj.next.title || ('Chapter ' + adj.next.chapter_number)) + ' &raquo;';
+    } else {
+      nextLink.style.visibility = 'hidden';
+    }
+  }).catch(function () {
+    // 失败时保留静态导航链接（由 front matter 提供）
+  });
+
+  // 显示阅读进度：获取章节总数
+  NovelDB.ready.then(function () {
+    return NovelDB.chapterList(novelId);
+  }).then(function (chapters) {
+    if (chapters.length > 0) {
+      progressEl.textContent = 'Chapter ' + chapterNumber + ' of ' + chapters.length;
+    }
+  }).catch(function () {});
+})();
 </script>

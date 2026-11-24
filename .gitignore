@@ -6,3 +6,6 @@ vendor
 *.log
 lib/*
 seodoc/*
+.env
+.env.*
+supabase/*-export.json

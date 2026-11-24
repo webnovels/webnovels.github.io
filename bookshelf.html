@@ -210,6 +210,7 @@ redirect_from:
   }
 </style>
 
+<script src="{{ '/assets/js/supabase.js' | relative_url }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   var bookshelfKey = 'webnovels_bookshelf';
@@ -220,7 +221,6 @@ document.addEventListener('DOMContentLoaded', function() {
   var bookshelf = JSON.parse(localStorage.getItem(bookshelfKey) || '[]');
 
   if (bookshelf.length === 0) {
-    // 显示空状态
     listDiv.innerHTML = '<div class="empty-state">' +
       '<i class="fa fa-bookmark-o"></i>' +
       '<h2>Your bookshelf is empty</h2>' +
@@ -230,102 +230,102 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
 
-  // 显示统计信息
   statsDiv.style.display = 'flex';
   statCount.textContent = bookshelf.length;
 
-  // 加载小说索引
-  fetch('{{ "/search.json" | relative_url }}')
-    .then(function(r) { return r.json(); })
-    .then(function(novels) {
-      // 构建 URL -> novel 的映射
-      var novelMap = {};
-      novels.forEach(function(n) {
-        novelMap[n.url] = n;
+  // 优先用 Supabase 按 URL 批量查询，失败回退到 search.json
+  NovelDB.ready.then(function (client) {
+    var useSb = !!client;
+    var dataPromise;
+
+    if (useSb) {
+      dataPromise = NovelDB.byUrls(bookshelf).then(function (novels) {
+        // novels 是与 bookshelf 同序的数组，可能含 null
+        return novels.map(function (n, i) {
+          return n || { url: bookshelf[i], title: 'View Novel', description: 'Novel details not available.' };
+        });
       });
+    } else {
+      dataPromise = fetch('{{ "/search.json" | relative_url }}')
+        .then(function(r) { return r.json(); })
+        .then(function(novels) {
+          var novelMap = {};
+          novels.forEach(function(n) { novelMap[n.url] = n; });
+          return bookshelf.map(function (novelUrl) {
+            var n = novelMap[novelUrl] || novelMap[novelUrl.replace(/^https?:\/\/[^/]+/, '')];
+            return n || { url: novelUrl, title: 'View Novel', description: 'Novel details not available.' };
+          });
+        });
+    }
 
+    dataPromise.then(function(shelfNovels) {
       var html = '';
-      var foundCount = 0;
+      shelfNovels.forEach(function(novel) {
+        var isReal = !!novel.cover_image;
+        var cover = isReal
+          ? '<img src="' + novel.cover_image + '" alt="' + escapeHtml(novel.title) + '" loading="lazy">'
+          : '<div class="cover-placeholder"><i class="fa fa-book"></i></div>';
+        var desc = novel.description ? escapeHtml(novel.description.substring(0, 120)) : '';
+        var readBtn = isReal
+          ? '<a href="' + novel.url + '" class="read-btn" style="display:inline-block;background:#3498db;color:white;padding:8px 15px;border-radius:4px;font-size:0.85rem;">Continue Reading</a>'
+          : '<a href="' + novel.url + '" style="color:#3498db;font-size:0.85rem;">Open page →</a>';
 
-      bookshelf.forEach(function(novelUrl) {
-        // 尝试精确匹配和带域名匹配
-        var novel = novelMap[novelUrl] || novelMap[novelUrl.replace(/^https?:\/\/[^/]+/, '')];
-
-        if (novel) {
-          foundCount++;
-          var cover = novel.cover_image
-            ? '<img src="' + novel.cover_image + '" alt="' + escapeHtml(novel.title) + '" loading="lazy">'
-            : '<div class="cover-placeholder">' + escapeHtml(novel.title.charAt(0)) + '</div>';
-          var desc = novel.description ? escapeHtml(novel.description.substring(0, 120)) : '';
-
-          html += '<div class="novel-card" data-novel-url="' + escapeHtml(novelUrl) + '">' +
-            '<button class="remove-btn" title="Remove from bookshelf"><i class="fa fa-times"></i></button>' +
-            '<div class="novel-cover">' + cover + '</div>' +
-            '<div class="novel-info">' +
-              '<h3><a href="' + novel.url + '">' + escapeHtml(novel.title) + '</a></h3>' +
-              '<p class="novel-desc">' + desc + '</p>' +
-              '<div class="novel-meta">' +
-                '<span><i class="fa fa-tag"></i> ' + escapeHtml(novel.genre || 'Fiction') + '</span>' +
-                '<span><i class="fa fa-star"></i> ' + (novel.rating || 4.0) + '</span>' +
-              '</div>' +
-              '<a href="' + novel.url + '" class="read-btn" style="display:inline-block;background:#3498db;color:white;padding:8px 15px;border-radius:4px;font-size:0.85rem;">Continue Reading</a>' +
-            '</div>' +
-          '</div>';
-        } else {
-          // 小说未在索引中找到，显示 URL 链接
-          html += '<div class="novel-card" data-novel-url="' + escapeHtml(novelUrl) + '">' +
-            '<button class="remove-btn" title="Remove from bookshelf"><i class="fa fa-times"></i></button>' +
-            '<div class="cover-placeholder"><i class="fa fa-book"></i></div>' +
-            '<div class="novel-info">' +
-              '<h3><a href="' + novelUrl + '">View Novel</a></h3>' +
-              '<p class="novel-desc">Novel details not available.</p>' +
-              '<a href="' + novelUrl + '" style="color:#3498db;font-size:0.85rem;">Open page →</a>' +
-            '</div>' +
-          '</div>';
-        }
+        html += '<div class="novel-card" data-novel-url="' + escapeHtml(bookshelf[shelfNovels.indexOf(novel)] || novel.url) + '">' +
+          '<button class="remove-btn" title="Remove from bookshelf"><i class="fa fa-times"></i></button>' +
+          '<div class="novel-cover">' + cover + '</div>' +
+          '<div class="novel-info">' +
+            '<h3><a href="' + novel.url + '">' + escapeHtml(novel.title) + '</a></h3>' +
+            '<p class="novel-desc">' + desc + '</p>' +
+            (isReal ? '<div class="novel-meta">' +
+              '<span><i class="fa fa-tag"></i> ' + escapeHtml(novel.genre || 'Fiction') + '</span>' +
+              '<span><i class="fa fa-star"></i> ' + (novel.rating || 4.0) + '</span>' +
+            '</div>' : '') +
+            readBtn +
+          '</div>' +
+        '</div>';
       });
 
       listDiv.innerHTML = html;
-
-      // 绑定删除按钮
-      document.querySelectorAll('.remove-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          var card = this.closest('.novel-card');
-          var url = card.getAttribute('data-novel-url');
-          var shelf = JSON.parse(localStorage.getItem(bookshelfKey) || '[]');
-          shelf = shelf.filter(function(u) { return u !== url; });
-          localStorage.setItem(bookshelfKey, JSON.stringify(shelf));
-          if (window.trackEvent) trackEvent('bookmark_removed', { novel_url: url, source: 'bookshelf_page' });
-
-          // 动画移除
-          card.style.transition = 'opacity 0.3s, transform 0.3s';
-          card.style.opacity = '0';
-          card.style.transform = 'scale(0.8)';
-          setTimeout(function() {
-            card.remove();
-            // 更新计数
-            var newCount = JSON.parse(localStorage.getItem(bookshelfKey) || '[]').length;
-            statCount.textContent = newCount;
-            if (newCount === 0) {
-              statsDiv.style.display = 'none';
-              listDiv.innerHTML = '<div class="empty-state">' +
-                '<i class="fa fa-bookmark-o"></i>' +
-                '<h2>Your bookshelf is empty</h2>' +
-                '<p>Start adding novels while reading!</p>' +
-                '<a href="{{ "/" | relative_url }}" class="browse-btn">Browse Novels</a>' +
-                '</div>';
-            }
-          }, 300);
-        });
-      });
-    })
-    .catch(function(e) {
+      bindRemoveButtons();
+    }).catch(function(e) {
       listDiv.innerHTML = '<div class="empty-state">' +
         '<i class="fa fa-exclamation-triangle"></i>' +
         '<h2>Error loading bookshelf</h2>' +
         '<p>Please refresh the page or try again later.</p>' +
         '</div>';
     });
+  });
+
+  function bindRemoveButtons() {
+    document.querySelectorAll('.remove-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var card = this.closest('.novel-card');
+        var url = card.getAttribute('data-novel-url');
+        var shelf = JSON.parse(localStorage.getItem(bookshelfKey) || '[]');
+        shelf = shelf.filter(function(u) { return u !== url; });
+        localStorage.setItem(bookshelfKey, JSON.stringify(shelf));
+        if (window.trackEvent) trackEvent('bookmark_removed', { novel_url: url, source: 'bookshelf_page' });
+
+        card.style.transition = 'opacity 0.3s, transform 0.3s';
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.8)';
+        setTimeout(function() {
+          card.remove();
+          var newCount = JSON.parse(localStorage.getItem(bookshelfKey) || '[]').length;
+          statCount.textContent = newCount;
+          if (newCount === 0) {
+            statsDiv.style.display = 'none';
+            listDiv.innerHTML = '<div class="empty-state">' +
+              '<i class="fa fa-bookmark-o"></i>' +
+              '<h2>Your bookshelf is empty</h2>' +
+              '<p>Start adding novels while reading!</p>' +
+              '<a href="{{ "/" | relative_url }}" class="browse-btn">Browse Novels</a>' +
+              '</div>';
+          }
+        }, 300);
+      });
+    });
+  }
 
   function escapeHtml(str) {
     var div = document.createElement('div');

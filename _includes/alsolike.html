@@ -1,7 +1,7 @@
 <!-- You May Also Like Section -->
-<div class="you-may-also-like">
+<div class="you-may-also-like" id="you-may-also-like">
     <h3>You May Also Like</h3>
-    <div class="related-novels">
+    <div class="related-novels" id="related-novels">
       {% assign novel_indexes = "" | split: ',' %}
       {% for item in site.novels %}
         {% assign url_parts = item.url | split: '/' %}
@@ -30,15 +30,53 @@
             <a href="{{ novel.url | relative_url }}" class="related-read-btn">Read Now</a>
           </div>
         </div>
-        {% if forloop.index == 3 %}
-        <div id="container-b5f172e1b4dd73e35d84f383d130b32e"></div>
-       {% endif %}
-
       {% endfor %}
     </div>
   </div>
 
   <script async="async" data-cfasync="false" src="//pl26635144.profitableratecpm.com/b5f172e1b4dd73e35d84f383d130b32e/invoke.js"></script>
+  <script src="{{ '/assets/js/supabase.js' | relative_url }}"></script>
+  <script>
+  // 使用 Supabase 拉取实时随机推荐，替换构建时的静态推荐
+  (function() {
+    var container = document.getElementById('related-novels');
+    if (!container) return;
+
+    // 从当前 URL 提取小说 id 用于排除自身
+    var currentId = null;
+    var m = window.location.pathname.match(/\/novels\/(\d+)/);
+    if (m) currentId = parseInt(m[1], 10);
+
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function render(novels) {
+      if (!novels || novels.length === 0) return; // 保留静态回退
+      var html = novels.map(function(n) {
+        var cover = n.cover_image
+          ? '<a href="' + n.url + '"><img src="' + n.cover_image + '" alt="' + escapeHtml(n.title) + '" loading="lazy"></a>'
+          : '<div class="cover-placeholder small">' + escapeHtml(n.title.charAt(0)) + '</div>';
+        return '<div class="related-novel-card">' +
+          '<div class="related-novel-cover">' + cover + '</div>' +
+          '<div class="related-novel-info">' +
+            '<h4><a href="' + n.url + '">' + escapeHtml(n.title) + '</a></h4>' +
+            '<div class="related-novel-meta"><span class="related-genre">' + escapeHtml(n.genre || 'Fiction') + '</span></div>' +
+            '<a href="' + n.url + '" class="related-read-btn">Read Now</a>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+      container.innerHTML = html;
+    }
+
+    NovelDB.ready.then(function (client) {
+      if (!client) return; // 未配置 Supabase，保留静态推荐
+      NovelDB.recommend(6, currentId).then(render).catch(function(){});
+    }).catch(function(){});
+  })();
+  </script>
   <style>
     /* You May Also Like Section Styles */
     .you-may-also-like {

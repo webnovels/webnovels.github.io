@@ -69,6 +69,10 @@ defaults:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+exclude:
+  - supabase/
+  - scripts/
+  - seodoc/
 webp:
   enabled: true
   quality: 80       # 质量 (0-100)

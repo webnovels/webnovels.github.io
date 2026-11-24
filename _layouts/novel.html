@@ -123,8 +123,8 @@ layout: default
         </div>
     </div>
   <h2>Table of Contents</h2>
-  <ul class="chapter-list">
-    <li>
+  <ul class="chapter-list" id="chapterList">
+    <li class="more-link">
         <a href="./more/" rel="nofollow">
           More
         </a>
@@ -132,7 +132,7 @@ layout: default
     {% assign chapters = site.novels | where_exp: "item", "item.url contains page.url" | where_exp: "item", "item.chapter_number" | sort: "chapter_number" %}
     
     {% for chapter in chapters %}
-      <li>
+      <li class="static-chapter">
         <a href="{{ chapter.url | relative_url }}" rel="nofollow">
           {% if chapter.chapter_number %}Chapter {{ chapter.chapter_number }}{% endif %}
           {% if chapter.title %}：{{ chapter.title }}{% endif %}
@@ -157,6 +157,46 @@ layout: default
         crossorigin="anonymous"
         async>
 </script>
+  <script src="/assets/js/supabase.js"></script>
+  <script>
+  // 动态加载章节目录（来自 Supabase）
+  // 静态 Liquid 生成的列表作为 SEO 兜底；JS 加载成功后替换为数据库数据
+  (function () {
+    var path = window.location.pathname;
+    var m = path.match(/\/novels\/(\d+)\/?/);
+    if (!m) return;
+    var novelId = parseInt(m[1], 10);
+    var list = document.getElementById('chapterList');
+    if (!list || !window.NovelDB) return;
+
+    NovelDB.ready.then(function () {
+      return NovelDB.chapterList(novelId);
+    }).then(function (chapters) {
+      if (!chapters || chapters.length === 0) return;
+
+      // 移除静态章节项（保留 More 链接）
+      list.querySelectorAll('.static-chapter').forEach(function (li) {
+        li.remove();
+      });
+
+      // 插入动态章节项
+      var frag = document.createDocumentFragment();
+      chapters.forEach(function (c) {
+        var li = document.createElement('li');
+        var a = document.createElement('a');
+        a.href = '/novels/' + novelId + '/' + c.chapter_number + '/';
+        a.rel = 'nofollow';
+        var title = c.title || ('Chapter ' + c.chapter_number);
+        a.textContent = 'Chapter ' + c.chapter_number + (title !== 'Chapter ' + c.chapter_number ? '：' + title : '');
+        li.appendChild(a);
+        frag.appendChild(li);
+      });
+      list.appendChild(frag);
+    }).catch(function () {
+      // 失败：保留静态列表
+    });
+  })();
+  </script>
   {%- include alsolike.html -%}
   <!-- <div class="sharethis-inline-share-buttons"></div> -->
 </div>
