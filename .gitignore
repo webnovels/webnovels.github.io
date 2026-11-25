@@ -9,3 +9,5 @@ seodoc/*
 .env
 .env.*
 supabase/*-export.json
+# _novels 由 scripts/pull-from-supabase.mjs 在构建时从 Supabase 生成
+_novels/

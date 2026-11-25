@@ -11,6 +11,14 @@ on:
   push:
     branches: ["main"]
 
+  # 允许 Supabase 数据库 Webhook 触发重建（插入/更新小说后自动发布）
+  repository_dispatch:
+    types: [supabase-update]
+
+  # 兜底：每小时自动重建一次（Webhook 配置好可删除此行）
+  schedule:
+    - cron: "0 * * * *"
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -43,6 +51,11 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
+      - name: Pull data from Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: node scripts/pull-from-supabase.mjs
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
