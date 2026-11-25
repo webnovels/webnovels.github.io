@@ -1,7 +1,7 @@
 ---
 layout: more
-titleO: "He Chose His "Bestie", so I Took Everything Back"
-title: "He Chose His "Bestie", so I Took Everything Back"
+titleO: "He Chose His \"Bestie\", so I Took Everything Back"
+title: "He Chose His \"Bestie\", so I Took Everything Back"
 novel_index: "/novels/1153/"
 previous_chapter: "/novels/1153/"
 token: "aac609"

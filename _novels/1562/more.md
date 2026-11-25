@@ -1,7 +1,7 @@
 ---
 layout: more
-titleO: "He Chose His "Pure" Mistress, I Took His Fortune"
-title: "He Chose His "Pure" Mistress, I Took His Fortune"
+titleO: "He Chose His \"Pure\" Mistress, I Took His Fortune"
+title: "He Chose His \"Pure\" Mistress, I Took His Fortune"
 novel_index: "/novels/1562/"
 previous_chapter: "/novels/1562/"
 token: "345269"
