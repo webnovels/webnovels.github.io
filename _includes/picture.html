@@ -1,2 +1,2 @@
 {% assign img = include.img | relative_url %}
-<img src="{{ img }}" alt="{{ include.alt }}" loading="lazy" />
+<img src="{{ img }}" alt="{{ include.alt | escape }}" loading="lazy" />

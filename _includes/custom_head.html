@@ -28,7 +28,7 @@
     })(window, document, "clarity", "script", "rq025v8j5n");
     // 显式设置页面路径，修复 URL 维度数据缺失问题
     clarity("set", "contentPath", "{{ page.url | default: '/' }}");
-    clarity("set", "pageTitle", "{{ page.title | default: 'WebNovels' }}");
+    clarity("set", "pageTitle", {{ page.title | default: 'WebNovels' | jsonify }});
     clarity("set", "pageType", "{{ page.layout | default: 'default' }}");
   </script>
   <!-- End Microsoft Clarity -->

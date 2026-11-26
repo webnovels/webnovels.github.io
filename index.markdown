@@ -18,7 +18,7 @@ description: Discover captivating original novels, web serials, and fiction stor
       <span class="trending-label"><i class="fa fa-fire"></i> Trending Now:</span>
       {% assign top_novels = site.novels | where: "featured", true | sort: 'views' | reverse | slice: 0, 5 %}
       {% for novel in top_novels %}
-        <a href="{{ novel.url | relative_url }}" class="trending-link" title="{{ novel.title }}">{{ novel.title | truncate: 30 }}</a>{% unless forloop.last %}<span class="trending-sep">·</span>{% endunless %}
+        <a href="{{ novel.url | relative_url }}" class="trending-link" title="{{ novel.title | escape }}">{{ novel.title | truncate: 30 }}</a>{% unless forloop.last %}<span class="trending-sep">·</span>{% endunless %}
       {% endfor %}
     </div>
   </div>

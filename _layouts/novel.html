@@ -13,7 +13,7 @@ layout: default
     "headline": {{ page.title | strip | jsonify }},
     "name": {{ page.title | strip | jsonify }},
     "description": {{ page.description | strip | jsonify }},
-    "image": {{ page.cover_image | default: '/assets/images/default-cover.jpg' | absolute_url | jsonify }},
+    "image": {{ page.cover_image | default: '/images/webfic.webp' | absolute_url | jsonify }},
     "datePublished": "{{ page.date | date: '%Y-%m-%d' }}",
     "dateModified": "{{ page.last_modified_at | default: page.date | date: '%Y-%m-%d' }}",
     
